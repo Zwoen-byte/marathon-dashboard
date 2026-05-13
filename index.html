@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Marathon 2027</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f7f7f5; --surface: #ffffff; --text: #1a1a1a; --text-sub: #6b7280;
+    --accent: #2563eb; --accent-light: #eff6ff; --border: #e5e7eb;
+    --green: #16a34a; --yellow: #ca8a04; --red: #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; padding-bottom: 70px; }
+  .hdr { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 16px 12px; position: sticky; top: 0; z-index: 100; }
+  .hdr-row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .hdr-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+  .hdr-sub { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
+  .countdown { text-align: right; }
+  .countdown-n { font-size: 28px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .countdown-l { font-size: 10px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
+  .alert-bar { background: #f0fdf4; border-bottom: 1px solid #bbf7d0; padding: 8px 16px; font-size: 12px; color: #14532d; display: flex; align-items: center; gap: 6px; }
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 200; padding-bottom: env(safe-area-inset-bottom); }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 4px 6px; cursor: pointer; color: var(--text-sub); font-size: 10px; gap: 3px; border: none; background: none; -webkit-tap-highlight-color: transparent; }
+  .nav-item svg { width: 20px; height: 20px; }
+  .nav-item.on { color: var(--accent); }
+  .tab-content { display: none; padding: 16px; }
+  .card { background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
+  .card-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-sub); margin-bottom: 12px; }
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .metric-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .metric-box { background: var(--bg); border-radius: 10px; padding: 12px 10px; text-align: center; }
+  .metric-val { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .metric-unit { font-size: 10px; color: var(--text-sub); }
+  .metric-label { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+  .metric-val.green { color: var(--green); } .metric-val.yellow { color: var(--yellow); } .metric-val.accent { color: var(--accent); }
+  .prog-row { margin-bottom: 10px; }
+  .prog-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+  .prog-label .sub { color: var(--text-sub); font-size: 11px; }
+  .prog-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+  .prog-fill.green { background: var(--green); }
+  .chart-wrap { position: relative; width: 100%; }
+  .run-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .run-table th { color: var(--text-sub); font-weight: 500; text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); }
+  .run-table td { padding: 6px 6px; border-bottom: 1px solid var(--border); }
+  .run-table tr:last-child td { border-bottom: none; }
+  .wd-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .wd-item:last-child { border-bottom: none; }
+  .wd-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .wd-dot.green { background: var(--green); } .wd-dot.yellow { background: var(--yellow); }
+  .wd-text { font-size: 13px; line-height: 1.4; } .wd-sub { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge.green { background: #dcfce7; color: var(--green); }
+  .plan-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .plan-item:last-child { border-bottom: none; }
+  .plan-day { font-size: 12px; font-weight: 700; color: var(--accent); min-width: 32px; }
+  .plan-desc { font-size: 13px; line-height: 1.4; } .plan-sub { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+  .plan-done { color: var(--green); }
+  /* KALENDER */
+  .kal-week { margin-bottom: 16px; }
+  .kal-week-hdr { font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 0 8px; display: flex; justify-content: space-between; align-items: center; }
+  .kal-week-hdr .kw-badge { font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-light); padding: 1px 7px; border-radius: 10px; }
+  .kal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .kal-day { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; min-height: 80px; padding: 5px 4px; cursor: pointer; transition: border-color 0.15s; position: relative; }
+  .kal-day:hover { border-color: var(--accent); }
+  .kal-day.today { border-color: var(--accent); background: var(--accent-light); }
+  .kal-day.past { opacity: 0.55; } .kal-day.rest { background: var(--bg); }
+  .kal-day-name { font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--text-sub); letter-spacing: 0.3px; margin-bottom: 2px; }
+  .kal-day-num { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+  .kal-day.today .kal-day-num { color: var(--accent); }
+  .kal-chip { font-size: 9px; font-weight: 600; padding: 2px 4px; border-radius: 4px; margin-bottom: 2px; line-height: 1.3; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kal-chip.training-z2 { background: #dbeafe; color: #1d4ed8; }
+  .kal-chip.training-long { background: #e0e7ff; color: #4338ca; }
+  .kal-chip.training-done { background: #dcfce7; color: #15803d; }
+  .kal-chip.termin-arbeit { background: #fef3c7; color: #b45309; }
+  .kal-chip.termin-privat { background: #fce7f3; color: #be185d; }
+  .kal-chip.termin-reise { background: #f0fdf4; color: #15803d; }
+  .kal-chip.termin-wichtig { background: #fee2e2; color: #b91c1c; }
+  .kal-add-btn { position: absolute; bottom: 3px; right: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-light); border: none; cursor: pointer; font-size: 13px; line-height: 18px; text-align: center; color: var(--accent); }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; align-items: flex-end; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border-radius: 16px 16px 0 0; padding: 20px 20px 32px; width: 100%; max-width: 480px; animation: slideUp 0.2s ease; }
+  @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+  .modal-field { margin-bottom: 12px; }
+  .modal-field label { display: block; font-size: 12px; color: var(--text-sub); margin-bottom: 4px; font-weight: 500; }
+  .modal-field input, .modal-field select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--text); }
+  .modal-field input:focus, .modal-field select:focus { outline: none; border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+  .btn { flex: 1; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; }
+  .btn-primary { background: var(--accent); color: white; } .btn-secondary { background: var(--border); color: var(--text); }
+  .termin-list { margin-top: 4px; }
+  .termin-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .termin-item:last-child { border-bottom: none; }
+  .termin-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .termin-dot.arbeit { background: #f59e0b; } .termin-dot.privat { background: #ec4899; } .termin-dot.reise { background: var(--green); } .termin-dot.wichtig { background: var(--red); }
+  .termin-info { flex: 1; } .termin-title { font-size: 13px; font-weight: 500; } .termin-meta { font-size: 11px; color: var(--text-sub); }
+  .termin-del { background: none; border: none; color: var(--text-sub); cursor: pointer; font-size: 18px; padding: 4px; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-row">
+    <div><div class="hdr-title">🏃 Marathon 2027</div><div class="hdr-sub">Sync: 13.05.2026 · Phase 1 – Aufbau</div></div>
+    <div class="countdown"><div class="countdown-n" id="days">…</div><div class="countdown-l">Tage bis Start</div></div>
+  </div>
+</div>
+<div class="alert-bar">✅ Schlaf 6h43 (manuell) · VO₂max Rekord: 50,15! 🎉</div>
+
+<!-- ÜBERSICHT -->
+<div id="tab-overview" class="tab-content">
+  <div class="card">
+    <div class="card-title">Heute · 13. Mai 2026</div>
+    <div class="metric-grid">
+      <div class="metric-box"><div class="metric-val accent">50.15</div><div class="metric-unit">ml/kg/min</div><div class="metric-label">VO₂max ↑ Rekord!</div></div>
+      <div class="metric-box"><div class="metric-val green">4.0</div><div class="metric-unit">km</div><div class="metric-label">Z2-Lauf ✓ heute</div></div>
+      <div class="metric-box"><div class="metric-val green">6.7</div><div class="metric-unit">h</div><div class="metric-label">Schlaf ✓ (manuell)</div></div>
+      <div class="metric-box"><div class="metric-val" style="font-size:16px;margin-top:4px">—</div><div class="metric-unit">bpm</div><div class="metric-label">Resting HR (Uhr leer)</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Phase 1 · KW20 Fortschritt</div>
+    <div class="prog-row"><div class="prog-label"><span>KW20 Volumen</span><span class="sub">4 / ~12.5 km</span></div><div class="prog-track"><div class="prog-fill" style="width:32%"></div></div></div>
+    <div class="prog-row"><div class="prog-label"><span>Phase 1 Gesamt</span><span class="sub">15.6 km</span></div><div class="prog-track"><div class="prog-fill green" style="width:20%"></div></div></div>
+    <div class="prog-row"><div class="prog-label"><span>Zeitfortschritt</span><span class="sub">Woche 2 von 16</span></div><div class="prog-track"><div class="prog-fill" style="width:9%"></div></div></div>
+  </div>
+  <div class="card"><div class="card-title">Wochenvolumen (km)</div><div class="chart-wrap" style="height:140px"><canvas id="volChart"></canvas></div></div>
+  <div class="card">
+    <div class="card-title">Wochenplan KW20</div>
+    <div class="plan-item"><div class="plan-day plan-done">Mi ✓</div><div><div class="plan-desc plan-done">Z2-Lauf · 4,0 km · 26 min</div><div class="plan-sub plan-done">08:47–09:13 · VO₂max 50,15</div></div></div>
+    <div class="plan-item"><div class="plan-day">Fr</div><div><div class="plan-desc">Z2-Lauf · 3–4 km</div><div class="plan-sub">Locker · HRV + Schlaf ≥6h</div></div></div>
+    <div class="plan-item"><div class="plan-day">So</div><div><div class="plan-desc">Long Run · 8–9 km</div><div class="plan-sub">Schlaf Sa-Nacht ≥6h · Z2-Pace</div></div></div>
+  </div>
+</div>
+
+<!-- KALENDER -->
+<div id="tab-calendar" class="tab-content">
+  <div id="kal-container"></div>
+  <div class="card">
+    <div class="card-title">Alle Termine</div>
+    <div id="termin-list-all" class="termin-list"><div style="color:var(--text-sub);font-size:12px;">Tippe auf einen Tag um einen Termin hinzuzufügen.</div></div>
+  </div>
+</div>
+
+<!-- TRAINING -->
+<div id="tab-training" class="tab-content">
+  <div class="card">
+    <div class="card-title">Alle Läufe Phase 1</div>
+    <table class="run-table">
+      <thead><tr><th>Datum</th><th>Typ</th><th>km</th><th>Pace</th></tr></thead>
+      <tbody>
+        <tr><td>06.05.</td><td>Z2</td><td>4.59</td><td>~7:30/km</td></tr>
+        <tr><td>10.05.</td><td>Long Run</td><td>7.02</td><td>~7:45/km</td></tr>
+        <tr><td><strong>13.05. ✓</strong></td><td>Z2</td><td><strong>4.0</strong></td><td>~6:30/km</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card"><div class="card-title">VO₂max Entwicklung</div><div class="chart-wrap" style="height:160px"><canvas id="vo2Chart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;text-align:center;">Aktuell: <strong style="color:var(--accent)">50.15 ml/kg/min</strong> · Ziel: 52+</div></div>
+  <div class="card"><div class="card-title">HR-Zonen</div><div class="chart-wrap" style="height:180px"><canvas id="zoneChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">Z2: 120–138 bpm · 7:00–8:00/km</div></div>
+</div>
+
+<!-- SCHLAF & HRV -->
+<div id="tab-sleep" class="tab-content">
+  <div class="card"><div class="card-title">Schlaf letzte 10 Nächte (h)</div><div class="chart-wrap" style="height:160px"><canvas id="sleepChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">Ø letzte 7 Nächte: 5.8h · Ziel: ≥7h</div></div>
+  <div class="card"><div class="card-title">HRV (ms) letzte 10 Tage</div><div class="chart-wrap" style="height:160px"><canvas id="hrvChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">Overnight-HRV Ø: ~43ms · Schwelle: 30ms</div></div>
+  <div class="card"><div class="card-title">Körper-Metriken</div>
+    <div class="metric-grid three">
+      <div class="metric-box"><div class="metric-val" style="font-size:16px;margin-top:4px">—</div><div class="metric-unit">bpm</div><div class="metric-label">Resting HR heute</div></div>
+      <div class="metric-box"><div class="metric-val">54</div><div class="metric-unit">bpm</div><div class="metric-label">Ø Resting HR</div></div>
+      <div class="metric-box"><div class="metric-val accent">50</div><div class="metric-unit">ms</div><div class="metric-label">HRV Overnight</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- WATCHDOG -->
+<div id="tab-watchdog" class="tab-content">
+  <div class="card">
+    <div class="card-title">Watchdog Status</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span class="badge green" style="font-size:14px;padding:4px 14px;">✓ GRÜN</span><span style="font-size:12px;color:var(--text-sub)">13. Mai 2026</span></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Keine 3 Lauftage in Folge</div><div class="wd-sub">Mi / Fr / So mit Pausen ✓</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Volumen-Steigerung ≤ 10%</div><div class="wd-sub">KW19: 11.61 → KW20-Ziel: ~12.5 km (+7.7%) ✓</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Schlaf vor Lauf ≥ 6h</div><div class="wd-sub">6h43 (23:32–06:15, manuell) ✓</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">HRV nicht ≥ 2 Tage unter 30ms</div><div class="wd-sub">Overnight-HRV: ~50ms ✓</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">VO₂max Entwicklung</div><div class="wd-sub">50.15 — neuer Rekord ↑ ✓</div></div></div>
+  </div>
+  <div class="card"><div class="card-title">Trainer-Empfehlung</div><div style="font-size:13px;line-height:1.8;">Starke Leistung heute — VO₂max-Rekord! 🎉<br><strong>Fr:</strong> ≥6–7h Schlaf, dann Z2 3–4 km.<br><strong>So:</strong> Früh schlafen → Long Run 8–9 km.<br><strong>Fokus:</strong> Schlaf ist die größte Stellschraube.</div></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnBg(event)">
+  <div class="modal">
+    <div class="modal-title" id="modal-date-title">Termin hinzufügen</div>
+    <div class="modal-field"><label>Titel</label><input type="text" id="modal-titel" placeholder="z.B. Meeting, Familienausflug…" maxlength="40"></div>
+    <div class="modal-field"><label>Typ</label>
+      <select id="modal-typ">
+        <option value="arbeit">💼 Arbeit</option>
+        <option value="privat">🏠 Privat</option>
+        <option value="reise">✈️ Reise</option>
+        <option value="wichtig">❗ Wichtig</option>
+      </select>
+    </div>
+    <div class="modal-field"><label>Uhrzeit (optional)</label><input type="time" id="modal-zeit"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveTermin()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-item on" onclick="showTab('overview',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Übersicht
+  </button>
+  <button class="nav-item" onclick="showTab('calendar',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Kalender
+  </button>
+  <button class="nav-item" onclick="showTab('training',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Training
+  </button>
+  <button class="nav-item" onclick="showTab('sleep',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>Schlaf & HRV
+  </button>
+  <button class="nav-item" onclick="showTab('watchdog',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Watchdog
+  </button>
+</nav>
+
+<script>
+const TODAY = new Date('2026-05-13');
+const MARATHON = new Date('2027-04-25T09:00:00');
+const DAY_NAMES = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+const DAY_NAMES_FULL = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+
+const TRAINING_PLAN = {
+  '2026-05-06': { type:'training-done', label:'Z2 4.6km ✓' },
+  '2026-05-10': { type:'training-done', label:'LR 7.0km ✓' },
+  '2026-05-13': { type:'training-done', label:'Z2 4.0km ✓' },
+  '2026-05-15': { type:'training-z2',   label:'Z2 3–4km' },
+  '2026-05-17': { type:'training-long', label:'LR 8–9km' },
+  '2026-05-20': { type:'training-z2',   label:'Z2 4–5km' },
+  '2026-05-22': { type:'training-z2',   label:'Z2 4km' },
+  '2026-05-24': { type:'training-long', label:'LR 10km' },
+  '2026-05-27': { type:'training-z2',   label:'Z2 5km' },
+  '2026-05-29': { type:'training-z2',   label:'Z2 4–5km' },
+  '2026-05-31': { type:'training-long', label:'LR 11–12km' },
+};
+
+let TERMINE = [];
+
+document.getElementById('days').textContent = Math.ceil((MARATHON - new Date()) / 86400000);
+
+let _trainR=false, _sleepR=false;
+function showTab(id, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.style.display='none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('on'));
+  document.getElementById('tab-'+id).style.display='block';
+  if(el) el.classList.add('on');
+  if(id==='training'&&!_trainR){_trainR=true;renderTraining();}
+  if(id==='sleep'&&!_sleepR){_sleepR=true;renderSleep();}
+  if(id==='calendar'){renderKalender();}
+}
+document.getElementById('tab-overview').style.display='block';
+
+const gc='rgba(0,0,0,0.06)', tc='#6b7280';
+const bO=()=>({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:10}},grid:{color:gc}}}});
+
+new Chart(document.getElementById('volChart').getContext('2d'),{type:'bar',data:{labels:['KW18','KW19','KW20'],datasets:[{data:[0,11.61,4.0],backgroundColor:['#93c5fd','#3b82f6','#2563eb'],borderRadius:6}]},options:{...bO(),scales:{x:{ticks:{color:tc,font:{size:11}},grid:{display:false}},y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},suggestedMax:15}}}});
+
+function renderTraining(){
+  new Chart(document.getElementById('vo2Chart').getContext('2d'),{type:'line',data:{labels:['06.05.','10.05.','13.05.'],datasets:[{data:[48.5,49.5,50.15],borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.1)',pointBackgroundColor:'#2563eb',pointRadius:5,tension:0.3,fill:true}]},options:{...bO(),scales:{x:{ticks:{color:tc,font:{size:11}},grid:{display:false}},y:{min:47,max:52,ticks:{color:tc,font:{size:10}},grid:{color:gc}}}}});
+  new Chart(document.getElementById('zoneChart').getContext('2d'),{type:'doughnut',data:{labels:['Z2 (120-138)','Z1 (<120)','Z3 (139-155)','Z4/5 (>155)'],datasets:[{data:[68,12,15,5],backgroundColor:['#2563eb','#93c5fd','#f59e0b','#dc2626'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'right',labels:{color:tc,font:{size:10},padding:8,boxWidth:10}}}}});
+}
+
+function renderSleep(){
+  const sd=[5.8,5.2,5.7,5.5,6.0,5.8,6.5,6.3,6.4,6.7];
+  const lb=['04','05','06','07','08','09','10','11','12','13'].map(d=>d+'.05');
+  new Chart(document.getElementById('sleepChart').getContext('2d'),{type:'bar',data:{labels:lb,datasets:[{data:sd,backgroundColor:sd.map(v=>v>=7?'#16a34a':v>=6?'#2563eb':v>=5?'#f59e0b':'#dc2626'),borderRadius:5}]},options:{...bO(),scales:{x:{ticks:{color:tc,font:{size:10}},grid:{display:false}},y:{min:0,max:9,ticks:{color:tc,font:{size:10}},grid:{color:gc}}}}});
+  const hd=[47,44,52,40,38,43,46,42,37,50];
+  new Chart(document.getElementById('hrvChart').getContext('2d'),{type:'line',data:{labels:lb,datasets:[{data:hd,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.08)',pointBackgroundColor:hd.map(v=>v<30?'#dc2626':v<40?'#f59e0b':'#2563eb'),pointRadius:5,tension:0.3,fill:true},{data:new Array(10).fill(30),borderColor:'#dc2626',borderDash:[4,4],borderWidth:1.5,pointRadius:0}]},options:{...bO(),plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{size:10}},grid:{display:false}},y:{min:0,ticks:{color:tc,font:{size:10}},grid:{color:gc}}}}});
+}
+
+// KALENDER
+function getMonday(d){const r=new Date(d);const day=r.getDay();r.setDate(r.getDate()+(day===0?-6:1-day));r.setHours(0,0,0,0);return r;}
+function dateStr(d){return d.toISOString().split('T')[0];}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function fmtDay(d){return d.getDate()+'.'+(d.getMonth()+1)+'.';}
+function getKW(date){const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));const dn=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-dn);const ys=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil((((d-ys)/86400000)+1)/7);}
+
+let _editDate=null;
+
+function renderKalender(){
+  const cont=document.getElementById('kal-container');
+  cont.innerHTML='';
+  const mon=getMonday(TODAY);
+  for(let w=0;w<3;w++){
+    const ws=addDays(mon,w*7);
+    const we=addDays(ws,6);
+    const kw=getKW(ws);
+    const wDiv=document.createElement('div');wDiv.className='kal-week';
+    const hdr=document.createElement('div');hdr.className='kal-week-hdr';
+    hdr.innerHTML=`<span>${fmtDay(ws)} – ${fmtDay(we)}</span><span class="kw-badge">KW ${kw}</span>`;
+    wDiv.appendChild(hdr);
+    const card=document.createElement('div');card.className='card';card.style.padding='10px';card.style.marginBottom='0';
+    const grid=document.createElement('div');grid.className='kal-grid';
+    for(let d=0;d<7;d++){
+      const day=addDays(ws,d);
+      const ds=dateStr(day);
+      const isToday=ds===dateStr(TODAY);
+      const isPast=day<TODAY&&!isToday;
+      const tr=TRAINING_PLAN[ds];
+      const te=TERMINE.filter(t=>t.datum===ds);
+      const dd=document.createElement('div');
+      dd.className='kal-day'+(isToday?' today':'')+(isPast?' past':'')+((!tr&&!isToday)?' rest':'');
+      dd.innerHTML=`<div class="kal-day-name">${DAY_NAMES[day.getDay()]}</div><div class="kal-day-num">${day.getDate()}</div>${tr?`<span class="kal-chip ${tr.type}">${tr.label}</span>`:''}${te.map(t=>`<span class="kal-chip termin-${t.typ}">${t.zeit?t.zeit+' ':''}${t.titel}</span>`).join('')}<button class="kal-add-btn" onclick="openModal('${ds}',event)">+</button>`;
+      dd.addEventListener('click',(e)=>{if(e.target.classList.contains('kal-add-btn'))return;openModal(ds);});
+      grid.appendChild(dd);
+    }
+    card.appendChild(grid);wDiv.appendChild(card);cont.appendChild(wDiv);
+  }
+  renderTerminList();
+}
+
+function openModal(ds,e){
+  if(e)e.stopPropagation();
+  _editDate=ds;
+  const d=new Date(ds+'T00:00:00');
+  document.getElementById('modal-date-title').textContent=DAY_NAMES_FULL[d.getDay()]+', '+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();
+  document.getElementById('modal-titel').value='';
+  document.getElementById('modal-typ').value='arbeit';
+  document.getElementById('modal-zeit').value='';
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('modal-titel').focus(),200);
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');_editDate=null;}
+function closeModalOnBg(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+function saveTermin(){
+  const titel=document.getElementById('modal-titel').value.trim();
+  if(!titel){document.getElementById('modal-titel').focus();return;}
+  TERMINE.push({id:'t'+Date.now(),datum:_editDate,titel,typ:document.getElementById('modal-typ').value,zeit:document.getElementById('modal-zeit').value});
+  closeModal();renderKalender();
+}
+function deleteTermin(id){TERMINE=TERMINE.filter(t=>t.id!==id);renderKalender();}
+function renderTerminList(){
+  const el=document.getElementById('termin-list-all');
+  if(!TERMINE.length){el.innerHTML='<div style="color:var(--text-sub);font-size:12px;">Tippe auf einen Tag um einen Termin hinzuzufügen.</div>';return;}
+  const sorted=[...TERMINE].sort((a,b)=>a.datum.localeCompare(b.datum));
+  const typl={arbeit:'💼 Arbeit',privat:'🏠 Privat',reise:'✈️ Reise',wichtig:'❗ Wichtig'};
+  el.innerHTML=sorted.map(t=>{const d=new Date(t.datum+'T00:00:00');const lbl=DAY_NAMES[d.getDay()]+' '+d.getDate()+'.'+(d.getMonth()+1)+'.';return`<div class="termin-item"><div class="termin-dot ${t.typ}"></div><div class="termin-info"><div class="termin-title">${t.titel}</div><div class="termin-meta">${lbl}${t.zeit?' · '+t.zeit:''} · ${typl[t.typ]||t.typ}</div></div><button class="termin-del" onclick="deleteTermin('${t.id}')">×</button></div>`;}).join('');
+}
+</script>
+</body>
+</html>
