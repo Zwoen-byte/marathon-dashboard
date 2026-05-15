@@ -20,7 +20,7 @@
   .countdown { text-align: right; }
   .countdown-n { font-size: 28px; font-weight: 800; color: var(--accent); line-height: 1; }
   .countdown-l { font-size: 10px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
-  .alert-bar { background: #fefce8; border-bottom: 1px solid #fde68a; padding: 8px 16px; font-size: 12px; color: #713f12; display: flex; align-items: center; gap: 6px; }
+  .alert-bar { background: #f0fdf4; border-bottom: 1px solid #bbf7d0; padding: 8px 16px; font-size: 12px; color: #14532d; display: flex; align-items: center; gap: 6px; }
   .nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 200; padding-bottom: env(safe-area-inset-bottom); }
   .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 4px 6px; cursor: pointer; color: var(--text-sub); font-size: 10px; gap: 3px; border: none; background: none; -webkit-tap-highlight-color: transparent; }
   .nav-item svg { width: 20px; height: 20px; }
@@ -109,7 +109,7 @@
     <div class="countdown"><div class="countdown-n" id="days">…</div><div class="countdown-l">Tage bis Start</div></div>
   </div>
 </div>
-<div class="alert-bar">⚠️ Z2-Lauf ✅ ~4km · HRV REKORD 65ms 🔥 · So: Ruhetag empfohlen (KW20 fast voll!)</div>
+<div class="alert-bar">✅ Z2-Lauf ✅ ~4km · HRV REKORD 65ms 🔥 · So 17.05.: Z2 ~4km möglich (KW20 = 8/12.2km)</div>
 
 <div id="tab-overview" class="tab-content">
   <div class="card">
@@ -134,7 +134,7 @@
     <div class="plan-item"><div class="plan-day plan-done">Mi ✓</div><div><div class="plan-desc plan-done">Z2-Lauf · ~4,0 km · VO₂max 50,15</div><div class="plan-sub plan-done">Pace ~6:52/km · Rekord ✅</div></div></div>
     <div class="plan-item"><div class="plan-day plan-done">Do ✓</div><div><div class="plan-desc plan-done">Regeneration · Schlaf 7h20 ✅</div><div class="plan-sub plan-done">HRV 43ms · Resting HR 53 bpm</div></div></div>
     <div class="plan-item"><div class="plan-day plan-done">Fr ✓</div><div><div class="plan-desc plan-done">Z2-Lauf · ~4,0 km</div><div class="plan-sub plan-done">Pace ~6:58/km · HRV Rekord 65ms 🔥</div></div></div>
-    <div class="plan-item"><div class="plan-day" style="color:var(--yellow)">So ⚠️</div><div><div class="plan-desc" style="color:var(--yellow)">Ruhetag empfohlen</div><div class="plan-sub">KW20 bereits 12km — +5%-Limit erreicht!</div></div></div>
+    <div class="plan-item"><div class="plan-day" style="color:var(--green)">So ✅</div><div><div class="plan-desc" style="color:var(--green)">Z2 ~4km</div><div class="plan-sub">KW20 = 8km, Budget noch ~4km → Long Run möglich!</div></div></div>
   </div>
 </div>
 
@@ -151,7 +151,7 @@
       <tbody>
         <tr><td>06.05.</td><td>Z2</td><td>4.59</td><td>~7:30/km</td></tr>
         <tr><td>10.05.</td><td>Long Run</td><td>7.02</td><td>~7:45/km</td></tr>
-        <tr><td>11.05. ✓</td><td>Z2</td><td>~4.0</td><td>~7:00/km</td></tr>
+        <tr><td>10.05. ✓</td><td>LR</td><td>7.0</td><td>~7:30/km</td></tr>
         <tr><td>13.05. ✓</td><td>Z2</td><td>~4.0</td><td>~6:52/km</td></tr>
         <tr><td><strong>15.05. ✓</strong></td><td>Z2</td><td><strong>~4.0</strong></td><td>~6:58/km</td></tr>
       </tbody>
@@ -170,16 +170,16 @@
 <div id="tab-watchdog" class="tab-content">
   <div class="card">
     <div class="card-title">Watchdog Status</div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span class="badge yellow" style="font-size:14px;padding:4px 14px;">⚠️ GELB</span><span style="font-size:12px;color:var(--text-sub)">15. Mai 2026 — Volumen-Grenze!</span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span class="badge green" style="font-size:14px;padding:4px 14px;">✅ GRÜN</span><span style="font-size:12px;color:var(--text-sub)">15. Mai 2026 — Alles im grünen Bereich</span></div>
     <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Keine 3 Lauftage in Folge</div><div class="wd-sub">Mo / Mi / Fr — je Ruhetag dazwischen ✓</div></div></div>
-    <div class="wd-item"><div class="wd-dot yellow"></div><div><div class="wd-text">Volumen-Steigerung ≤ 5%</div><div class="wd-sub">KW20 = 12km vs. KW19 = 11.61km → +3.4% ✅ — Long Run So würde +64% treiben! ⚠️</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Volumen-Steigerung ≤ 5%</div><div class="wd-sub">KW20 = 8km (Mi+Fr) vs. KW19 = 11.61km → max. 12.19km → So Z2 ~4km noch im Limit ✅</div></div></div>
     <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Schlaf vor Lauf ≥ 6h</div><div class="wd-sub">6h40 vor Fr-Lauf ✓</div></div></div>
     <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">HRV nicht ≥ 2 Tage unter 30ms</div><div class="wd-sub">HRV 65ms — Rekordwert! 🔥 Körper top erholt ✓</div></div></div>
     <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Ruhetag nach Long Run geplant</div><div class="wd-sub">So = Ruhetag (empfohlen) ✓</div></div></div>
   </div>
   <div class="card">
     <div class="card-title">Trainer-Empfehlung</div>
-    <div style="font-size:13px;line-height:1.8;"><strong>HRV 65ms</strong> — absoluter Rekordwert! Körper ist ausgezeichnet erholt. 🔥<br><strong>KW20 hat 12km</strong> (Mo+Mi+Fr) — das +5%-Limit ist erreicht.<br>⚠️ <strong>Long Run So streichen</strong> — sonst +64% Volumensprung!<br><strong>So:</strong> Ruhetag. Genießen!<br><strong>KW21:</strong> Nächste Woche neu starten — 3×4km + Long Run 4–5km.</div>
+    <div style="font-size:13px;line-height:1.8;"><strong>HRV 65ms</strong> — absoluter Rekordwert! Körper ist ausgezeichnet erholt. 🔥<br><strong>KW20 = 8km</strong> (Mi+Fr) — Limit 12.19km, noch ~4km Budget.<br>✅ <strong>Z2 ~4km am So 17.05. möglich</strong> — Pace 7:00–8:00/km (HF 120–138).<br><strong>Mo 18.05.:</strong> Ruhetag nach So-Lauf.<br><strong>KW21:</strong> Di+Do Z2 3–4km + erster richtiger Long Run So 4–5km.</div>
   </div>
 </div>
 
@@ -241,7 +241,7 @@ const gc = 'rgba(0,0,0,0.06)', tc = '#6b7280';
 const baseOpts = () => ({ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}}, y:{ticks:{color:tc,font:{size:10}},grid:{color:gc}} } });
 
 new Chart(document.getElementById('volChart').getContext('2d'), {
-  type:'bar', data:{ labels:['KW18','KW19','KW20 (Fr)'], datasets:[{ data:[0,11.61,12.0], backgroundColor:['#93c5fd','#3b82f6','#f59e0b'], borderRadius:6 }] },
+  type:'bar', data:{ labels:['KW18','KW19','KW20 (Fr)'], datasets:[{ data:[0,11.61,8.0], backgroundColor:['#93c5fd','#3b82f6','#3b82f6'], borderRadius:6 }] },
   options:{ ...baseOpts(), scales:{ x:{ticks:{color:tc,font:{size:11}},grid:{display:false}}, y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},suggestedMax:15} }}
 });
 
