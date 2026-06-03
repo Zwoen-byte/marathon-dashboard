@@ -125,11 +125,11 @@
 
 <div class="hdr">
   <div class="hdr-row">
-    <div><div class="hdr-title">🏃 Marathon 2027</div><div class="hdr-sub">Sync: 31.05.2026 · Phase 1 – Aufbau</div></div>
+    <div><div class="hdr-title">🏃 Marathon 2027</div><div class="hdr-sub">Sync: 03.06.2026 · Phase 1 – Aufbau · KW23 Deload</div></div>
     <div class="countdown"><div class="countdown-n" id="days">…</div><div class="countdown-l">Tage bis Start</div></div>
   </div>
 </div>
-<div class="alert-bar" style="background:#fefce8;border-bottom:1px solid #fde68a;color:#713f12;">⚠️ LR So 31.05. · 5,46km · KW22 = 13,43km / 13,1km Limit (leicht überschritten) · Schlaf Sa-Nacht 3h50 ⚠️⚠️ · HRV 32ms</div>
+<div class="alert-bar" style="background:#f0fdf4;border-bottom:1px solid #bbf7d0;color:#14532d;">✅ KW23 Deload · HRV 43ms ✅ Erholung! · Schlaf 7h41 ✅✅ · RHR 51 ✅✅ · VO₂max 52.14 💪 · erster Deload-Lauf heute möglich</div>
 
 <div id="tab-overview" class="tab-content">
   <div class="card">
@@ -292,7 +292,7 @@
 </nav>
 
 <script>
-const TODAY = new Date('2026-05-31T00:00:00');
+const TODAY = new Date('2026-06-03T00:00:00');
 const MARATHON = new Date('2027-04-25T09:00:00');
 const DAY_NAMES = ['So','Mo','Di','Mi','Do','Fr','Sa'];
 const DAY_NAMES_FULL = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
@@ -311,6 +311,9 @@ const TRAINING_PLAN = {
   '2026-05-26': { type:'training-done', label:'Z2 3.99km ✓' },
   '2026-05-28': { type:'training-done', label:'Z2 3.98km ✓' },
   '2026-05-31': { type:'training-done', label:'LR 5.46km ✓' },
+  '2026-06-03': { type:'training-z2',   label:'Z2 ~3km?' },
+  '2026-06-05': { type:'training-z2',   label:'Z2 ~3km' },
+  '2026-06-07': { type:'training-long', label:'LR ~4km' },
 };
 
 let TERMINE = [];
