@@ -126,37 +126,46 @@
 
 <div class="hdr">
   <div class="hdr-row">
-    <div><div class="hdr-title">🏃 Marathon 2027</div><div class="hdr-sub">Sync: 19.06.2026 · Phase 1 – Aufbau · KW25 läuft 🟢 · VO₂max REKORD 🔥</div></div>
+    <div><div class="hdr-title">🏃 Marathon 2027</div><div class="hdr-sub">Sync: 02.07.2026 · Phase 1 – Aufbau · KW27 Lauf Mi ✅ · HRV 30.9ms ⚠️ · Watchdog GELB</div></div>
     <div class="countdown"><div class="countdown-n" id="days">…</div><div class="countdown-l">Tage bis Start</div></div>
   </div>
 </div>
-<div class="alert-bar" style="background:#f0fdf4;border-bottom:1px solid #bbf7d0;color:#14532d;">🔥 VO₂max REKORD 53.66! · Z2 Fr 19.06. · 4,715km @ 6:31/km · HR 128bpm ✅ Z2 · KW25 = 8,59/15,6km · Do-Nacht 5.54h ⚠️ · Watchdog GRÜN</div>
+<div class="alert-bar" style="background:#fef9c3;border-bottom:1px solid #fde047;color:#78350f;">⚠️ WATCHDOG GELB · HRV Do 30.9ms Grenzbereich · Mi 01.07. Abendlauf 4,384km Z2 ✅ · KW27: 4,38 / 9,68km · heute Ruhetag empfohlen!</div>
 
 <div id="tab-overview" class="tab-content">
   <div class="card">
-    <div class="card-title">Heute · Fr 19. Juni 2026 · KW25 Z2-Lauf ✅ · VO₂max REKORD 🔥</div>
+    <div class="card-title">Do 2. Juli 2026 · KW27 · Ruhetag ⚠️ HRV Grenzbereich</div>
     <div class="metric-grid">
-      <div class="metric-box"><div class="metric-val green">34.3</div><div class="metric-unit">ms</div><div class="metric-label">HRV Do ✅</div></div>
-      <div class="metric-box"><div class="metric-val green">54</div><div class="metric-unit">bpm</div><div class="metric-label">RHR Do ✅</div></div>
-      <div class="metric-box"><div class="metric-val green">4.72</div><div class="metric-unit">km</div><div class="metric-label">Z2 heute ✅</div></div>
-      <div class="metric-box"><div class="metric-val green">53.66</div><div class="metric-unit">ml/kg/min</div><div class="metric-label">VO₂max 🔥🔥 REKORD!</div></div>
+      <div class="metric-box"><div class="metric-val yellow">30.9</div><div class="metric-unit">ms</div><div class="metric-label">HRV Do 02.07. ⚠️</div></div>
+      <div class="metric-box"><div class="metric-val green">54</div><div class="metric-unit">bpm</div><div class="metric-label">RHR Do 02.07. ✅</div></div>
+      <div class="metric-box"><div class="metric-val">6.29</div><div class="metric-unit">h</div><div class="metric-label">Schlaf Mi→Do ✅</div></div>
+      <div class="metric-box"><div class="metric-val accent">53.76</div><div class="metric-unit">ml/kg/min</div><div class="metric-label">VO₂max · Rekord 53.9 🔥</div></div>
     </div>
   </div>
   <div class="card">
-    <div class="card-title">KW25 · 8,59 / 15,6 km · Lauf 2 von ~3</div>
-    <div class="prog-row"><div class="prog-label"><span>KW25 Volumen</span><span class="sub">8,59 / 15,6 km · 55%</span></div><div class="prog-track"><div class="prog-fill" style="width:55%"></div></div></div>
-    <div class="prog-row"><div class="prog-label"><span>Phase 1 Gesamt</span><span class="sub">76,1 km (17 Läufe)</span></div><div class="prog-track"><div class="prog-fill green" style="width:95%"></div></div></div>
-    <div class="prog-row"><div class="prog-label"><span>Zeitfortschritt</span><span class="sub">Woche 7 von 16 · KW25 läuft</span></div><div class="prog-track"><div class="prog-fill" style="width:44%"></div></div></div>
+    <div class="card-title">KW27 · 4,384 / 9,68 km · 1 Lauf · läuft</div>
+    <div class="prog-row"><div class="prog-label"><span>KW27 Volumen</span><span class="sub">4,384 / 9,68 km · 45% · noch 5,30 km verfügbar</span></div><div class="prog-track"><div class="prog-fill green" style="width:45%"></div></div></div>
+    <div class="prog-row"><div class="prog-label"><span>KW26 ✅</span><span class="sub">9,22 km · kein LR wegen 41°C 🌡️</span></div><div class="prog-track"><div class="prog-fill" style="width:100%;background:#f59e0b"></div></div></div>
+    <div class="prog-row"><div class="prog-label"><span>Phase 1 Gesamt</span><span class="sub">396,72 km (71 Läufe)</span></div><div class="prog-track"><div class="prog-fill green" style="width:100%"></div></div></div>
   </div>
   <div class="card"><div class="card-title">Wochenvolumen (km)</div><div class="chart-wrap" style="height:140px"><canvas id="volChart"></canvas></div></div>
   <div class="card">
-    <div class="card-title">Wochenplan KW25 – läuft 🟢</div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Mo ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub plan-done">HRV 38.1ms ✅ · RHR 53 ✅ · Schlaf 6.21h</div></div></div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#4338ca">Di ✓</div><div><div class="plan-desc plan-done" style="color:#4338ca">Z2-Lauf ✅ · 3,87km</div><div class="plan-sub plan-done">Pace 6:26/km · HR 128bpm ✅ Z2 · VO₂max 53.08</div></div></div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Mi ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Radfahren ✓</div><div class="plan-sub plan-done">HRV 34.1ms ✅ · RHR 55 · Schlaf 6.61h ✅</div></div></div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Do ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Radfahren ✓</div><div class="plan-sub plan-done">HRV 34.3ms ✅ · RHR 54 ✅ · Schlaf 5.54h ⚠️</div></div></div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#4338ca">Fr ✓</div><div><div class="plan-desc plan-done" style="color:#4338ca">Z2-Lauf ✅ · 4,715km 🔥</div><div class="plan-sub plan-done">Pace 6:31/km · HR 128bpm ✅ Z2 · VO₂max 53.66 🔥🔥 REKORD!</div></div></div>
-    <div class="plan-item"><div class="plan-day" style="color:#4338ca">Sa/So</div><div><div class="plan-desc" style="color:#4338ca">Long Run ~7km (geplant)</div><div class="plan-sub">Noch ~7km bis Limit 15,6km</div></div></div>
+    <div class="card-title">KW26 Rückblick ✅ — Hitze-Woche 🌡️</div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Mo ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub plan-done">HRV 40.7ms ✅ · RHR 53 ✅ · Erholung nach LR KW25</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#4338ca">Di ✓</div><div><div class="plan-desc plan-done" style="color:#4338ca">Z2-Lauf ✅ · 4,647km</div><div class="plan-sub plan-done">Pace 6:27/km · HR 126bpm ✅ Z2 · VO₂max 53.87 🔥 REKORD! · 05:38 Uhr</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Mi ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub plan-done">HRV 57.8ms 🔥 · RHR 55 ✅ · super Erholung</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#4338ca">Do ✓</div><div><div class="plan-desc plan-done" style="color:#4338ca">Z2-Lauf ✅ · 4,573km</div><div class="plan-sub plan-done">Pace 6:41/km · HR 137bpm ✅ Z2 · VO₂max 53.9 🔥 NEUER REKORD! · 08:28 Uhr</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Fr ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub plan-done">HRV 45.4ms ✅ · RHR 54 ✅</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Sa ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub plan-done">HRV 37.9ms · RHR 53 ✅ · Hitze steigt</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#b45309">So ✗</div><div><div class="plan-desc plan-done" style="color:#b45309">Long Run abgesagt 🌡️</div><div class="plan-sub plan-done">41°C Höchsttemperatur — RICHTIGE Entscheidung! Gesundheit > Training</div></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Wochenplan KW27 (29.06.–05.07.2026)</div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Mo ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub">29.06. · HRV 42.2ms ✅</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Di ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub">30.06. · HRV 41.3ms ✅</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#4338ca">Mi ✓</div><div><div class="plan-desc plan-done" style="color:#4338ca">Z2-Lauf ✅ · 4,384km</div><div class="plan-sub">01.07. · Pace 6:32/km · HR 129bpm ✅ Z2 · 18:27 Uhr 🌙 Abendlauf!</div></div></div>
+    <div class="plan-item"><div class="plan-day" style="color:#ca8a04">Do ⚠️</div><div><div class="plan-desc" style="color:#ca8a04">Ruhetag ⚠️ HRV Grenzbereich</div><div class="plan-sub">02.07. (heute) · HRV 30.9ms · Ruhetag empfohlen!</div></div></div>
+    <div class="plan-item"><div class="plan-day" style="color:#2563eb">Sa/So</div><div><div class="plan-desc">Nächster Lauf wenn HRV ≥ 40ms</div><div class="plan-sub">04.–05.07. · Z2 oder LR · noch 5,30km verfügbar</div></div></div>
   </div>
 </div>
 
@@ -165,56 +174,55 @@
   <div class="card">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
       <div>
-        <div style="font-size:18px;font-weight:800;">📋 Sonntag, 31. Mai 2026</div>
-        <div style="font-size:12px;color:var(--text-sub);margin-top:2px;">KW22 · Tag 7 · Long Run ✅</div>
+        <div style="font-size:18px;font-weight:800;">📋 Donnerstag, 2. Juli 2026</div>
+        <div style="font-size:12px;color:var(--text-sub);margin-top:2px;">KW27 · Mi 01.07. Z2-Lauf 4.384km ✅ · HRV 30.9ms ⚠️ · Watchdog GELB · Ruhetag</div>
       </div>
-      <span class="badge green" style="margin-left:auto;font-size:13px;padding:3px 12px;">✅ GRÜN</span>
+      <span class="badge yellow" style="margin-left:auto;font-size:13px;padding:3px 12px;">⚠️ GELB</span>
     </div>
-    <div class="analyse-highlight green">
-      🏃 <strong>Deload-Lauf 3,36km @ 6:22/km</strong> — Z2 ✅ HR 127bpm · VO₂max 52.99 neuer Bestwert 🔥 · Schlaf ~7h ✅ (Uhr nicht getragen) · So LR ~4km möglich ✅
+    <div class="analyse-highlight" style="background:#fef9c3;border-left:3px solid #ca8a04;">
+      ⚠️ <strong>HRV 30.9ms Grenzbereich</strong> — Abwärtstrend 5 Tage (46→42→41→37→31ms) + Abendlauf-Effekt + kurze Nacht Mo→Di (4.37h) → Ruhetag heute!
     </div>
     <div class="stat-chips">
-      <span class="stat-chip" style="background:#fef2f2;border-color:#fecaca;color:#dc2626;">Schlaf Sa-Nacht 3h50 ⚠️⚠️</span>
-      <span class="stat-chip yellow">HRV 32ms ⚠️</span>
-      <span class="stat-chip">RHR 52 bpm ✅</span>
-      <span class="stat-chip">VO₂max 51,64</span>
-      <span class="stat-chip yellow">KW22: 13,43km ⚠️</span>
+      <span class="stat-chip yellow">HRV 30.9ms ⚠️</span>
+      <span class="stat-chip green">RHR 54 ✅</span>
+      <span class="stat-chip green">Schlaf 6.29h</span>
+      <span class="stat-chip green">4.384km Z2 ✅</span>
+      <span class="stat-chip accent">VO₂max 53.76</span>
     </div>
   </div>
 
   <div class="card">
-    <div class="analyse-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-sub);margin-bottom:10px;">😴 Schlaf & Erholung</div>
-    <div class="analyse-row"><span class="lbl">Schlaf Fr-Nacht (vor Sa-Lauf)</span><span class="val green">~7h ✅ (Uhr nicht getragen – keine Messung)</span></div>
-    <div class="analyse-row"><span class="lbl">HRV (06.06.)</span><span class="val yellow">30.2 ms ⚠️ genau Grenzwert</span></div>
-    <div class="analyse-row"><span class="lbl">Resting HR (06.06.)</span><span class="val green">53 bpm ✅</span></div>
-    <div class="analyse-row"><span class="lbl">Ø Schlaf letzte 3 Nächte</span><span class="val green">6.89h ✅</span></div>
-    <div class="analyse-row"><span class="lbl">VO₂max</span><span class="val accent">52.99 🔥 neuer Bestwert!</span></div>
-    <div class="analyse-text" style="margin-top:10px;">Schlaf Fr-Nacht ~7h ✅ (Uhr nicht getragen). HRV 30.2ms leicht unter Normalwert, aber kein Schlafdefizit als Ursache. VO₂max steigt weiter auf 52.99 🔥. <strong>So 07.06. Long Run ~4km möglich</strong> — Deload-Rahmen einhalten, konservatives Tempo.</div>
+    <div class="analyse-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-sub);margin-bottom:10px;">💪 Erholung & Körper</div>
+    <div class="analyse-row"><span class="lbl">HRV Do 02.07. (heute)</span><span class="val" style="color:#ca8a04;">30.9ms ⚠️ Grenzbereich — knapp über Schwelle!</span></div>
+    <div class="analyse-row"><span class="lbl">HRV Mi 01.07. (nach Lauf)</span><span class="val">36.8ms — normaler Abfall nach Abendlauf</span></div>
+    <div class="analyse-row"><span class="lbl">HRV Di 30.06.</span><span class="val green">41.3ms ✅</span></div>
+    <div class="analyse-row"><span class="lbl">RHR Do 02.07.</span><span class="val green">54 bpm ✅ — stabil trotz Belastung</span></div>
+    <div class="analyse-row"><span class="lbl">Schlaf Mi→Do (letzte Nacht)</span><span class="val green">6.29h ✅ (01:12–07:30) · Deep 0.99h / REM 1.61h</span></div>
+    <div class="analyse-row"><span class="lbl">Schlaf Mo→Di (kritisch!)</span><span class="val" style="color:#dc2626;">4.37h ⚠️⚠️ — sehr kurze Nacht! hat HRV beeinflusst</span></div>
+    <div class="analyse-row"><span class="lbl">VO₂max Mi 01.07.</span><span class="val accent">53.76 (leicht gesunken vom Rekord 53.9 — Abendlauf-Effekt normal)</span></div>
+    <div class="analyse-text" style="margin-top:10px;">HRV-Abwärtstrend: 42→41→37→31ms. Kombination aus kurzem Schlaf Mo→Di (4.37h) und Abendlauf Mi hat HRV auf 30.9ms gedrückt. RHR stabil bei 54 bpm — kein echtes Übertraining, nur kurzfristige Ermüdung. Ruhetag heute richtig, danach Sa/So Lauf wenn HRV wieder ≥40ms.</div>
   </div>
 
   <div class="card">
-    <div class="analyse-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-sub);margin-bottom:10px;">📊 KW23 Status (Sa 06.06.)</div>
-    <div class="analyse-row"><span class="lbl">Volumen KW23 bisher</span><span class="val green">7.04 km (2 Läufe) ✅</span></div>
-    <div class="analyse-row"><span class="lbl">Wochenlimit KW23</span><span class="val">14.1 km</span></div>
-    <div class="analyse-row"><span class="lbl">Noch verfügbar</span><span class="val green">7.06 km ✅</span></div>
-    <div class="analyse-row"><span class="lbl">Läufe: Mi + Sa</span><span class="val accent">3.68km + 3.36km</span></div>
-    <div class="analyse-row"><span class="lbl">Watchdog Gesamt</span><span class="val green">GRÜN ✅</span></div>
-    <div class="analyse-text" style="margin-top:10px;">Deload KW23 läuft perfekt. Mi 3.68km + Sa 3.36km = 7.04km. Schlaf Fr-Nacht ~7h ✅ (Uhr nicht getragen). HRV 30.2ms leicht tief, aber kein Schlafdefizit. <strong>So 07.06.: LR ~4km ✅</strong> — Deload-Pace locker halten, Mo Ruhetag danach.</div>
+    <div class="analyse-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-sub);margin-bottom:10px;">📊 KW26 Abschluss</div>
+    <div class="analyse-row"><span class="lbl">KW27 Volumen bisher</span><span class="val">4.384 km / 9.68km Limit · 45% · noch 5.30km</span></div>
+    <div class="analyse-row"><span class="lbl">Mi 01.07. Z2-Lauf 🌙</span><span class="val green">4.384km · Pace 6:32/km · HR 129bpm ✅ Z2 · 18:27 Uhr!</span></div>
+    <div class="analyse-row"><span class="lbl">KW26 ✅ Abschluss</span><span class="val">9.22km · Di 4.647km + Do 4.573km · LR abgesagt 41°C</span></div>
+    <div class="analyse-text" style="margin-top:10px;">Erster Abendlauf der Saison Mi 01.07. war ein Erfolg — Z2 gehalten, gute Werte. Abendläufe drücken typischerweise die HRV etwas. Zusammen mit kurzem Schlaf Mo→Di = HRV Do 30.9ms. Kein Grund zur Panik — RHR stabil, kein echtes Übertraining. Ruhetag Do, dann Sa/So wenn HRV ≥40ms.</div>
   </div>
 
   <div class="card">
-    <div class="analyse-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-sub);margin-bottom:10px;">🎯 Ausblick KW23/KW24</div>
-    <div class="analyse-highlight yellow">
-      <strong>So 07.06. — Long Run ~4km ✅</strong><br>
-      Schlaf ~7h ✅ (Uhr nicht getragen) · HRV 30.2ms leicht tief aber kein Alarm · Deload-Pace, locker bleiben!
-    </div>
-    <div class="analyse-highlight green">
-      <strong>KW23 Deload läuft perfekt!</strong><br>
-      7.04km von 14.1km = gutes Deload-Volumen. Mit So-LR ~4km → KW23 gesamt ~11km. Körper erholt sich gut.
+    <div class="analyse-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-sub);margin-bottom:10px;">🎯 KW27 Ausblick</div>
+    <div class="analyse-highlight" style="background:#fef9c3;border-left:3px solid #ca8a04;">
+      <strong>Heute Do: RUHETAG</strong> — HRV 30.9ms Grenzbereich · Erholung priorität!
     </div>
     <div class="analyse-highlight green">
-      <strong>KW24 starten:</strong> HRV ≥ 38ms + Schlaf ≥ 7h für 2 Nächte<br>
-      Dann: LR ~5–6km wieder möglich. Limit KW24 = ~14.1km (selbes Niveau nach Deload).
+      <strong>Nächster Lauf: Sa 04.07. oder So 05.07.</strong><br>
+      Wenn HRV wieder ≥ 40ms ✅ · noch 5.30km KW27-Limit · Z2 oder LR möglich!
+    </div>
+    <div class="analyse-highlight green">
+      <strong>VO₂max Trend: 53.9 🔥 REKORD hält!</strong><br>
+      53.87 → 53.9 REKORD → 53.76 (Abendlauf-Effekt) · Ziel 55+ erreichbar!
     </div>
   </div>
 
@@ -248,29 +256,33 @@
         <tr><td><strong>12.06. ✓</strong></td><td>Z2</td><td><strong>4.66</strong></td><td>6:35/km · HR 128 ✅ Z2 · VO₂max 53.35 🔥 · Schlaf 7.0h ✅ · HRV 29.5ms ⚠️</td></tr>
         <tr><td><strong>14.06. ✓</strong></td><td>Long Run</td><td><strong>5.66</strong></td><td>6:25/km · HR ~127 ✅ Z2 · VO₂max 53.17 · HRV 43.8ms ✅ · RHR 48 ✅ TOP!</td></tr>
         <tr><td><strong>16.06. ✓</strong></td><td>Z2</td><td><strong>3.87</strong></td><td>6:26/km · HR 128 ✅ Z2 · VO₂max 53.08 · HRV 33.2ms ⚠️ · Power 191W</td></tr>
+        <tr><td><strong>19.06. ✓</strong></td><td>Z2</td><td><strong>4.715</strong></td><td>6:31/km · HR 128 ✅ Z2 · VO₂max 53.66 🔥🔥 REKORD! · GCT 281ms · Power 188.7W</td></tr>
+        <tr><td><strong>21.06. ✓</strong></td><td>Long Run</td><td><strong>7.058</strong></td><td>6:55/km · HR 134 ✅ Z2 · VO₂max 53.61 · GCT 302ms · Power 178.1W · HRV 67.5ms 🔥🔥</td></tr>
+        <tr><td><strong>23.06. ✓</strong></td><td>Z2</td><td><strong>4.647</strong></td><td>6:27/km · HR 126 ✅ Z2 · VO₂max 53.87 🔥 REKORD! · GCT 281ms · Power 195.8W · 05:38 Uhr</td></tr>
+        <tr><td><strong>25.06. ✓</strong></td><td>Z2</td><td><strong>4.573</strong></td><td>6:41/km · HR 137 ✅ Z2 · VO₂max 53.9 🔥 NEUER REKORD! · GCT 291ms · Power 181.2W · 08:28 Uhr 🌡️</td></tr>
+        <tr style="background:var(--accent-light)"><td><strong>01.07. ✓</strong></td><td>Z2</td><td><strong>4.384</strong></td><td>6:32/km · HR 129 ✅ Z2 · VO₂max 53.76 · GCT 288ms · Power 186.4W · 18:27 Uhr 🌙 Abendlauf!</td></tr>
       </tbody>
     </table>
-    <div style="font-size:11px;color:var(--text-sub);margin-top:8px;">KW25: 3,87km (1 Lauf) / 15,6km · Phase 1 gesamt: 71,4km · 16 Läufe total</div>
+    <div style="font-size:11px;color:var(--text-sub);margin-top:8px;">KW27: 4,384km · KW26 ✅: 9,22km · Phase 1 gesamt: 396,72km · 71 Läufe total · LR Peak: 7.058km 🏃 · VO₂max REKORD 53.9 🔥</div>
   </div>
-  <div class="card"><div class="card-title">VO₂max Entwicklung</div><div class="chart-wrap" style="height:160px"><canvas id="vo2Chart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;text-align:center;">Aktuell: <strong style="color:var(--green)">53.08 ml/kg/min ✅</strong> · Trend: 53.11 → 53.35 → 53.17 → 53.08 stabil · Ziel: 55+</div></div>
+  <div class="card"><div class="card-title">VO₂max Entwicklung</div><div class="chart-wrap" style="height:160px"><canvas id="vo2Chart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;text-align:center;">Aktuell: <strong style="color:var(--accent)">53.76 ml/kg/min</strong> (Mi 01.07.) · Rekord: <strong style="color:var(--green)">53.9 🔥 (Do 25.06.)</strong> · Trend: 53.87 → 53.9 → 53.76 · Ziel: 55+</div></div>
   <div class="card"><div class="card-title">HR-Zonen (Alle Läufe)</div><div class="chart-wrap" style="height:180px"><canvas id="zoneChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">Z2 Zielzone: 120–138 bpm · Pace 7:00–8:00/km</div></div>
 </div>
 
 <div id="tab-sleep" class="tab-content">
-  <div class="card"><div class="card-title">Schlaf letzte 20 Nächte (h)</div><div class="chart-wrap" style="height:160px"><canvas id="sleepChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">Ø letzte 7 Nächte: ~6.6h · Ziel: ≥7h · Di-Nacht 8h11 ✅✅</div></div>
-  <div class="card"><div class="card-title">HRV (ms) letzte 20 Tage</div><div class="chart-wrap" style="height:160px"><canvas id="hrvChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">HRV Heute: <strong style="color:var(--accent)">37ms</strong> · Peak: 65ms 🔥 · Schwelle: 30ms</div></div>
-  <div class="card"><div class="card-title">Körper-Metriken</div><div class="metric-grid three"><div class="metric-box"><div class="metric-val" style="color:var(--orange)">58</div><div class="metric-unit">bpm</div><div class="metric-label">Resting HR heute</div></div><div class="metric-box"><div class="metric-val">54</div><div class="metric-unit">bpm</div><div class="metric-label">Ø Resting HR</div></div><div class="metric-box"><div class="metric-val accent">37</div><div class="metric-unit">ms</div><div class="metric-label">HRV heute</div></div></div></div>
+  <div class="card"><div class="card-title">Schlaf letzte Nächte (h)</div><div class="chart-wrap" style="height:160px"><canvas id="sleepChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">Ø letzte 7 Nächte: ~5.9h · Ziel: ≥7h · letzte Nacht: 6.29h ✅ · 🟢 ≥7h &nbsp;🔵 6–7h &nbsp;🟡 5–6h &nbsp;🔴 &lt;5h</div></div>
+  <div class="card"><div class="card-title">HRV (ms) Verlauf</div><div class="chart-wrap" style="height:160px"><canvas id="hrvChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">HRV Do 02.07.: <strong style="color:var(--yellow)">30.9ms ⚠️</strong> · Mi: 36.8ms · Di: 41.3ms ✅ · Schwelle: 30ms</div></div>
+  <div class="card"><div class="card-title">Körper-Metriken</div><div class="metric-grid three"><div class="metric-box"><div class="metric-val yellow">30.9</div><div class="metric-unit">ms</div><div class="metric-label">HRV Do 02.07. ⚠️</div></div><div class="metric-box"><div class="metric-val green">54</div><div class="metric-unit">bpm</div><div class="metric-label">RHR Do 02.07. ✅</div></div><div class="metric-box"><div class="metric-val accent">53.76</div><div class="metric-unit">ml/kg/min</div><div class="metric-label">VO₂max · Rekord 53.9</div></div></div></div>
 </div>
 
 <div id="tab-watchdog" class="tab-content">
   <div class="card">
     <div class="card-title">Watchdog Status</div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span class="badge green" style="font-size:14px;padding:4px 14px;">✅ GRÜN</span><span style="font-size:12px;color:var(--text-sub)">6. Juni 2026 — KW23 Tag 6</span></div>
-    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Keine 3 Lauftage in Folge</div><div class="wd-sub">Mi 03.06. + (Do/Fr Ruhe) + Sa 06.06. — kein 3-in-Folge ✓</div></div></div>
-    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Volumen-Steigerung ≤ 5%</div><div class="wd-sub">KW23 = 7,04km / max. 14,1km — Deload ✅ deutlich im Rahmen</div></div></div>
-    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Schlaf vor Long Run ≥ 6h</div><div class="wd-sub">Fr-Nacht ~7h ✅ (Uhr nicht getragen – keine Messung, manuell bestätigt)</div></div></div>
-    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">HRV nicht ≥ 2 Tage unter 30ms</div><div class="wd-sub">HRV 30.2ms heute — knapp, aber nur 1 Tag → kein Alarm ✓</div></div></div>
-    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Ruhetag nach Long Run</div><div class="wd-sub">Sa kein LR → Mo als leichter Ruhetag nach So-LR einplanen ✓</div></div></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span class="badge yellow" style="font-size:14px;padding:4px 14px;">⚠️ GELB</span><span style="font-size:12px;color:var(--text-sub)">02. Juli 2026 — HRV 30.9ms Grenzbereich · Abwärtstrend · heute Ruhetag!</span></div>
+    <div class="wd-item"><div class="wd-dot yellow"></div><div><div class="wd-text">HRV Grenzbereich ⚠️</div><div class="wd-sub">Do 02.07.: 30.9ms — knapp über Schwelle (30ms) · Abwärtstrend 5 Tage · nach Abendlauf + kurzer Nacht</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Keine 3 Lauftage in Folge</div><div class="wd-sub">KW27: nur Mi 01.07. gelaufen — Ruhetage Mo, Di, Do ✓</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Volumen-Steigerung ≤ 5%</div><div class="wd-sub">KW27: 4.384km / Limit 9.68km ✅ — 45% genutzt · noch 5.30km verfügbar</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">HRV nicht ≥ 2 Tage unter 30ms</div><div class="wd-sub">Kein Wert unter 30ms ✓ · Do 30.9ms ist knappster Wert · bei 2 Tagen &lt;30ms → ROT!</div></div></div>
   </div>
   <div class="card">
     <div class="card-title">Trainer-Empfehlung</div>
@@ -298,7 +310,7 @@
 </nav>
 
 <script>
-const TODAY = new Date('2026-06-16T00:00:00');
+const TODAY = new Date('2026-07-02T00:00:00');
 const MARATHON = new Date('2027-04-25T09:00:00');
 const DAY_NAMES = ['So','Mo','Di','Mi','Do','Fr','Sa'];
 const DAY_NAMES_FULL = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
@@ -331,9 +343,11 @@ const TRAINING_PLAN = {
   '2026-06-15': { type:'training-rest', label:'Ruhetag ✓' },
   '2026-06-16': { type:'training-done', label:'Z2 3.87km ✓' },
   // KW25 — Aufbau (Limit ~15.6km)
-  '2026-06-17': { type:'training-plan', label:'Z2 ~4–5km' },
-  '2026-06-19': { type:'training-plan', label:'Z2 ~4km' },
-  '2026-06-21': { type:'training-long', label:'LR ~7km' },
+  '2026-06-17': { type:'training-rest', label:'Rad ✓' },
+  '2026-06-18': { type:'training-rest', label:'Rad ✓' },
+  '2026-06-19': { type:'training-done', label:'Z2 4.72km ✓ 🔥' },
+  '2026-06-20': { type:'training-rest', label:'Ruhetag ✓' },
+  '2026-06-21': { type:'training-done', label:'LR 7.06km ✓ 🏃' },
   '2026-06-22': { type:'training-rest', label:'Ruhetag' },
   // KW26 — Aufbau (~15km Ziel)
   '2026-06-24': { type:'training-plan', label:'Z2 ~5km' },
@@ -365,14 +379,14 @@ const gc = 'rgba(0,0,0,0.06)', tc = '#6b7280';
 const baseOpts = () => ({ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}}, y:{ticks:{color:tc,font:{size:10}},grid:{color:gc}} } });
 
 new Chart(document.getElementById('volChart').getContext('2d'), {
-  type:'bar', data:{ labels:['KW19','KW20','KW21','KW22','KW23','KW24','KW25'], datasets:[{ data:[11.61,12.0,12.45,13.43,7.04,14.63,3.87], backgroundColor:['#3b82f6','#16a34a','#16a34a','#ca8a04','#16a34a','#16a34a','#93c5fd'], borderRadius:6 }] },
-  options:{ ...baseOpts(), scales:{ x:{ticks:{color:tc,font:{size:11}},grid:{display:false}}, y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},suggestedMax:15} }}
+  type:'bar', data:{ labels:['KW19','KW20','KW21','KW22','KW23','KW24','KW25','KW26','KW27'], datasets:[{ data:[11.61,12.0,12.45,13.43,7.04,14.63,15.638,9.22,4.384], backgroundColor:['#3b82f6','#16a34a','#16a34a','#ca8a04','#16a34a','#16a34a','#f59e0b','#f59e0b','#2563eb'], borderRadius:6 }] },
+  options:{ ...baseOpts(), scales:{ x:{ticks:{color:tc,font:{size:11}},grid:{display:false}}, y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},suggestedMax:17} }}
 });
 
 function renderTraining() {
   new Chart(document.getElementById('vo2Chart').getContext('2d'), {
-    type:'line', data:{ labels:['06.05.','10.05.','13.05.','15.05.','17.05.','19.05.','21.05.','24.05.','28.05.'], datasets:[{ data:[48.5,49.5,50.15,50.11,50.73,52.48,51.59,51.53,51.64], borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', pointBackgroundColor:['#2563eb','#2563eb','#2563eb','#2563eb','#2563eb','#16a34a','#2563eb','#4338ca','#16a34a'], pointRadius:[5,5,5,5,5,7,5,7,7], tension:0.3, fill:true }] },
-    options:{ ...baseOpts(), scales:{ x:{ticks:{color:tc,font:{size:11}},grid:{display:false}}, y:{min:47,max:54,ticks:{color:tc,font:{size:10}},grid:{color:gc}} }}
+    type:'line', data:{ labels:['06.05.','10.05.','13.05.','15.05.','17.05.','19.05.','21.05.','24.05.','28.05.','03.06.','06.06.','09.06.','12.06.','14.06.','16.06.','19.06.','21.06.','23.06.','25.06.','01.07.'], datasets:[{ data:[48.5,49.5,50.15,50.11,50.73,52.48,51.59,51.53,51.64,52.36,52.99,53.11,53.35,53.17,53.08,53.66,53.61,53.87,53.9,53.76], borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', pointBackgroundColor:['#2563eb','#2563eb','#2563eb','#2563eb','#2563eb','#16a34a','#2563eb','#4338ca','#16a34a','#16a34a','#16a34a','#16a34a','#16a34a','#16a34a','#2563eb','#dc2626','#16a34a','#16a34a','#dc2626','#2563eb'], pointRadius:[5,5,5,5,5,7,5,7,7,7,7,7,8,7,7,10,8,7,10,7], tension:0.3, fill:true }] },
+    options:{ ...baseOpts(), scales:{ x:{ticks:{color:tc,font:{size:9}},grid:{display:false}}, y:{min:47,max:56,ticks:{color:tc,font:{size:10}},grid:{color:gc}} }}
   });
   new Chart(document.getElementById('zoneChart').getContext('2d'), {
     type:'doughnut', data:{ labels:['Z2 (120-138)','Z1 (<120)','Z3 (139-155)','Z4/5 (>155)'], datasets:[{ data:[68,12,15,5], backgroundColor:['#2563eb','#93c5fd','#f59e0b','#dc2626'], borderWidth:2, borderColor:'#fff' }] },
@@ -381,17 +395,20 @@ function renderTraining() {
 }
 
 function renderSleep() {
-  const sleepData = [5.9,5.3,6.0,5.8,6.5,6.3,6.25,6.25,5.60,4.53,7.34,6.66,5.39,7.18,6.75,5.70,6.32,6.47,5.88,8.26];
-  const lbls = ['04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','24'].map(d => d+'.05');
+  // Schlaf: +30.06.(4.37h), +01.07.(5.91h), +02.07.(6.29h) — 38 Einträge
+  const sleepData = [5.9,5.3,6.0,5.8,6.5,6.3,6.25,6.25,5.60,4.53,7.34,6.66,5.39,7.18,6.75,5.70,6.32,6.47,5.88,8.26,6.76,8.19,6.76,6.38,7.14,6.21,6.23,6.61,5.54,5.91,5.19,5.40,6.11,6.91,6.32,4.37,5.91,6.29];
+  const lbls = ['04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','24'].map(d => d+'.05').concat(['25.05','26.05','27.05','28.05','29.05','15.06','16.06','17.06','18.06','21.06','23.06','25.06','27.06','28.06','29.06','30.06','01.07','02.07']);
   new Chart(document.getElementById('sleepChart').getContext('2d'), {
     type:'bar', data:{ labels:lbls, datasets:[{ data:sleepData, backgroundColor:sleepData.map(v=>v>=7?'#16a34a':v>=6?'#2563eb':v>=5?'#f59e0b':'#dc2626'), borderRadius:5 }] },
     options:{ ...baseOpts(), scales:{ x:{ticks:{color:tc,font:{size:9}},grid:{display:false}}, y:{min:0,max:9,ticks:{color:tc,font:{size:10}},grid:{color:gc}} }}
   });
-  const hrv = [40,38,43,46,42,37,46,38,37,37,43,65,45,41,45,40,33,38,38,37];
+  // HRV: MUSS gleich lang sein wie sleepData (38 Werte) — +41(Di30.06), +37(Mi01.07), +31(Do02.07)
+  // Achtung: hrv nutzt GLEICHE lbls wie sleepData! Lücken in hrv mit letztem Wert füllen (interpoliert)
+  const hrv = [40,38,43,46,42,37,46,38,37,37,43,65,45,41,45,40,33,38,38,37,44,43,40,37,34,38,33,34,34,39,46,58,45,38,46,41,37,31];
   new Chart(document.getElementById('hrvChart').getContext('2d'), {
     type:'line', data:{ labels:lbls, datasets:[
-      { data:hrv, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.08)', pointBackgroundColor:hrv.map(v=>v<30?'#dc2626':v<40?'#f59e0b':v>=60?'#16a34a':'#2563eb'), pointRadius:hrv.map((v,i)=>i===hrv.length-1?7:5), tension:0.3, fill:true },
-      { data:new Array(20).fill(30), borderColor:'#dc2626', borderDash:[4,4], borderWidth:1.5, pointRadius:0 }
+      { data:hrv, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.08)', pointBackgroundColor:hrv.map(v=>v<30?'#dc2626':v<40?'#f59e0b':v>=50?'#16a34a':'#2563eb'), pointRadius:hrv.map((v,i)=>i===hrv.length-1?7:5), tension:0.3, fill:true },
+      { data:new Array(hrv.length).fill(30), borderColor:'#dc2626', borderDash:[4,4], borderWidth:1.5, pointRadius:0 }
     ]},
     options:{ ...baseOpts(), plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:tc,font:{size:9}},grid:{display:false}}, y:{min:0,ticks:{color:tc,font:{size:10}},grid:{color:gc}} }}
   });
