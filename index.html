@@ -1,4 +1,10 @@
-<!DOCTYPE html>
+<!DOCTYPE html><script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Marathon Dashboard 2027 V2",
+  "schemaVersion": 1,
+  "description": "Marathon 2027 Dashboard — Sync 08.08.2026 · Phase 1 neu kalibriert (LR-Basis 8,404 km) · rollierender 8-Wochen-Kalender KW33–KW40, Long Run fest auf Samstag · HRV 41–48ms · Deep-Sleep-Durchbruch · 180,451 km / 36 Läufe · Watchdog GRÜN."
+}
+</script>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -7,9 +13,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 <style>
   :root {
+    color-scheme: light;
     --bg: #f7f7f5; --surface: #ffffff; --text: #1a1a1a; --text-sub: #6b7280;
     --accent: #2563eb; --accent-light: #eff6ff; --border: #e5e7eb;
     --green: #16a34a; --yellow: #ca8a04; --red: #dc2626; --orange: #ea580c;
+    --lr: #4338ca; --lr-light: #e0e7ff; --kraft: #e5644e;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; padding-bottom: 70px; }
@@ -20,12 +28,13 @@
   .countdown { text-align: right; }
   .countdown-n { font-size: 28px; font-weight: 800; color: var(--accent); line-height: 1; }
   .countdown-l { font-size: 10px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
-  .alert-bar { background: #f0fdf4; border-bottom: 1px solid #bbf7d0; padding: 8px 16px; font-size: 12px; color: #14532d; display: flex; align-items: center; gap: 6px; }
+  .alert-bar { padding: 8px 16px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
   .nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 200; padding-bottom: env(safe-area-inset-bottom); }
   .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 2px 6px; cursor: pointer; color: var(--text-sub); font-size: 9px; gap: 3px; border: none; background: none; -webkit-tap-highlight-color: transparent; }
   .nav-item svg { width: 20px; height: 20px; }
   .nav-item.on { color: var(--accent); }
   .tab-content { display: none; padding: 16px; }
+  .tab-content.active { display: block; }
   .card { background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
   .card-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-sub); margin-bottom: 12px; }
   .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
@@ -40,7 +49,7 @@
   .prog-label .sub { color: var(--text-sub); font-size: 11px; }
   .prog-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
   .prog-fill { height: 100%; border-radius: 3px; background: var(--accent); }
-  .prog-fill.green { background: var(--green); } .prog-fill.yellow { background: var(--yellow); }
+  .prog-fill.green { background: var(--green); } .prog-fill.yellow { background: var(--yellow); } .prog-fill.red { background: var(--red); }
   .chart-wrap { position: relative; width: 100%; }
   .run-table { width: 100%; border-collapse: collapse; font-size: 12px; }
   .run-table th { color: var(--text-sub); font-weight: 500; text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); }
@@ -52,7 +61,7 @@
   .wd-dot.green { background: var(--green); } .wd-dot.yellow { background: var(--yellow); } .wd-dot.red { background: var(--red); }
   .wd-text { font-size: 13px; line-height: 1.4; } .wd-sub { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-  .badge.green { background: #dcfce7; color: var(--green); } .badge.yellow { background: #fef9c3; color: var(--yellow); }
+  .badge.green { background: #dcfce7; color: var(--green); } .badge.yellow { background: #fef9c3; color: var(--yellow); } .badge.red { background: #fee2e2; color: var(--red); }
   .plan-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
   .plan-item:last-child { border-bottom: none; }
   .plan-day { font-size: 12px; font-weight: 700; color: var(--accent); min-width: 32px; }
@@ -74,22 +83,22 @@
   .kal-chip.training-long { background: #e0e7ff; color: #4338ca; }
   .kal-chip.training-done { background: #dcfce7; color: #15803d; }
   .kal-chip.training-rest { background: #f3f4f6; color: #6b7280; }
+  .kal-chip.training-deload { background: #fef9c3; color: #b45309; }
   .kal-chip.training-plan { background: #ede9fe; color: #6d28d9; }
+  .kal-chip.training-kraft { background: #ffe4e0; color: #b91c1c; }
   .kal-chip.termin-arbeit { background: #fef3c7; color: #b45309; }
   .kal-chip.termin-privat { background: #fce7f3; color: #be185d; }
-  .kal-chip.termin-reise { background: #f0fdf4; color: #15803d; }
+  .kal-chip.termin-reise { background: #dcfce7; color: #15803d; }
   .kal-chip.termin-wichtig { background: #fee2e2; color: #b91c1c; }
   .kal-add-btn { position: absolute; bottom: 3px; right: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--border); border: none; cursor: pointer; font-size: 11px; line-height: 16px; text-align: center; color: var(--text-sub); display: none; }
   .kal-day:hover .kal-add-btn { display: block; }
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; align-items: flex-end; justify-content: center; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border-radius: 16px 16px 0 0; padding: 20px 20px 32px; width: 100%; max-width: 480px; animation: slideUp 0.2s ease; }
-  @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal { background: var(--surface); border-radius: 16px 16px 0 0; padding: 20px 20px 32px; width: 100%; max-width: 480px; }
   .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
   .modal-field { margin-bottom: 12px; }
   .modal-field label { display: block; font-size: 12px; color: var(--text-sub); margin-bottom: 4px; font-weight: 500; }
   .modal-field input, .modal-field select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--text); }
-  .modal-field input:focus, .modal-field select:focus { outline: none; border-color: var(--accent); }
   .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
   .btn { flex: 1; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; }
   .btn-primary { background: var(--accent); color: white; } .btn-secondary { background: var(--border); color: var(--text); }
@@ -100,220 +109,380 @@
   .termin-dot.arbeit { background: #f59e0b; } .termin-dot.privat { background: #ec4899; } .termin-dot.reise { background: var(--green); } .termin-dot.wichtig { background: var(--red); }
   .termin-info { flex: 1; } .termin-title { font-size: 13px; font-weight: 500; } .termin-meta { font-size: 11px; color: var(--text-sub); }
   .termin-del { background: none; border: none; color: var(--text-sub); cursor: pointer; font-size: 16px; padding: 4px; }
-  .analyse-section { padding: 12px 0; border-bottom: 1px solid var(--border); }
-  .analyse-section:last-child { border-bottom: none; }
-  .analyse-label { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
-  .analyse-text { font-size: 13px; line-height: 1.7; color: var(--text); }
-  .analyse-date-chip { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; margin-bottom: 10px; }
   .analyse-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
   .analyse-row:last-child { border-bottom: none; }
   .analyse-row .lbl { color: var(--text-sub); font-size: 12px; }
   .analyse-row .val { font-weight: 600; }
-  .analyse-row .val.green { color: var(--green); }
-  .analyse-row .val.yellow { color: var(--yellow); }
-  .analyse-row .val.accent { color: var(--accent); }
+  .analyse-row .val.green { color: var(--green); } .analyse-row .val.yellow { color: var(--yellow); } .analyse-row .val.red { color: var(--red); } .analyse-row .val.accent { color: var(--accent); }
   .analyse-highlight { background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 10px 12px; margin-bottom: 8px; font-size: 13px; line-height: 1.6; }
   .analyse-highlight.green { background: #f0fdf4; border-color: var(--green); }
   .analyse-highlight.yellow { background: #fefce8; border-color: var(--yellow); }
+  .analyse-highlight.red { background: #fef2f2; border-color: var(--red); }
+  .analyse-text { font-size: 13px; line-height: 1.7; color: var(--text); }
   .stat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .stat-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--text); }
   .stat-chip.green { background: #dcfce7; border-color: #bbf7d0; color: var(--green); }
   .stat-chip.yellow { background: #fef9c3; border-color: #fde68a; color: var(--yellow); }
+  .stat-chip.red { background: #fee2e2; border-color: #fecaca; color: var(--red); }
   .stat-chip.accent { background: var(--accent-light); border-color: #bfdbfe; color: var(--accent); }
+  .analyse-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-sub); margin-bottom: 10px; }
+
+  /* ---- Long-Run-Leiter ---- */
+  .ladder { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; align-items: end; height: 132px; margin-top: 14px; }
+  .ladder-col { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; cursor: pointer; }
+  .ladder-val { font-size: 9.5px; font-weight: 700; text-align: center; margin-bottom: 3px; color: var(--lr); }
+  .ladder-col.regen .ladder-val { color: var(--text-sub); }
+  .ladder-col.ist .ladder-val { color: var(--green); }
+  .ladder-bar { border-radius: 3px 3px 0 0; background: linear-gradient(180deg, var(--lr) 0%, #a5b4fc 100%); }
+  .ladder-col.regen .ladder-bar { background: repeating-linear-gradient(135deg, rgba(107,114,128,.45) 0 3px, rgba(107,114,128,.14) 3px 6px); }
+  .ladder-col.ist .ladder-bar { background: linear-gradient(180deg, var(--green) 0%, #86efac 100%); }
+  .ladder-col.on .ladder-bar { outline: 2px solid var(--lr); outline-offset: 1px; }
+  .ladder-axis { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+  .ladder-axis span { font-size: 9px; color: var(--text-sub); text-align: center; font-weight: 600; }
+
+  /* ---- Wochenkarten ---- */
+  .wk { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; overflow: hidden; background: var(--surface); }
+  .wk.regen { border-style: dashed; background: #fffdf5; }
+  .wk-hdr { display: flex; align-items: center; gap: 8px; padding: 11px 12px; cursor: pointer; flex-wrap: wrap; }
+  .wk-kw { font-size: 12px; font-weight: 800; letter-spacing: .04em; }
+  .wk-dates { font-size: 11px; color: var(--text-sub); }
+  .wk-tag { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 2px 7px; border-radius: 10px; background: var(--accent-light); color: var(--accent); }
+  .wk.regen .wk-tag { background: #fef9c3; color: #b45309; }
+  .wk-vol { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--text-sub); }
+  .wk-body { border-top: 1px solid var(--border); }
+  .wk-day { display: grid; grid-template-columns: 42px 1fr auto; gap: 10px; align-items: baseline; padding: 9px 12px; border-top: 1px solid var(--border); }
+  .wk-day:first-child { border-top: none; }
+  .wk-d { font-size: 11px; font-weight: 700; } .wk-d span { display: block; font-size: 9px; font-weight: 500; color: var(--text-sub); }
+  .wk-t { font-size: 13px; font-weight: 600; } .wk-t span { display: block; font-size: 11px; font-weight: 400; color: var(--text-sub); margin-top: 1px; }
+  .wk-km { text-align: right; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+  .wk-km span { display: block; font-size: 9.5px; font-weight: 500; color: var(--text-sub); margin-top: 1px; }
+  .c-kurz { color: #2563eb; } .c-mittel { color: #16a34a; } .c-lr { color: var(--lr); } .c-kraft { color: var(--kraft); }
+  .rule-row { display: grid; grid-template-columns: 26px 1fr; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; line-height: 1.5; }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-id { font-size: 10px; font-weight: 800; color: var(--accent); background: var(--accent-light); border-radius: 5px; text-align: center; padding: 2px 0; height: 18px; }
+  .ms-row { display: grid; grid-template-columns: 54px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; line-height: 1.5; }
+  .ms-row:last-child { border-bottom: none; }
+  .ms-date { font-size: 11px; font-weight: 800; color: var(--lr); }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+  .legend span { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--text-sub); }
+  .legend i { width: 8px; height: 8px; border-radius: 50%; display: block; }
 </style>
 </head>
 <body>
 
 <div class="hdr">
   <div class="hdr-row">
-    <div><div class="hdr-title">🏃 Marathon 2027</div><div class="hdr-sub">Sync: 08.08.2026 · Phase 2 – Aufbau · KW32 · 🎉 NEUER LR-PEAK 8,40km (komplett Z2!) · HRV 52,7ms · GRÜN</div></div>
+    <div><div class="hdr-title">🏃 Marathon 2027</div><div class="hdr-sub">Sync: 08.08.2026 · <strong>Phase 1 – Grundlage</strong> (bis Anfang Okt.) · KW32 · HRV 41–48ms ✅ · 🎉 Deep Sleep · RHR 52 ✅ · Watchdog GRÜN</div></div>
     <div class="countdown"><div class="countdown-n" id="days">…</div><div class="countdown-l">Tage bis Start</div></div>
   </div>
 </div>
-<div class="alert-bar" style="background:#eff6ff;border-bottom:1px solid #bfdbfe;color:#1e40af;">🎉 NEUER LONG-RUN-PEAK · Sa 08.08. 8,404km @7:13 (avgHR 132, maxHR nur 141 — komplett Z2!) · alter Peak 7,752km übertroffen! · HRV 52,7ms ✅ · KW32 13,62km</div>
+<div class="alert-bar" style="background:#eff6ff;border-bottom:1px solid #bfdbfe;color:#1e40af;">🎉 LONG-RUN-PEAK Sa 08.08. <strong>8,404km @7:13</strong> (maxHR nur 141 — komplett Z2) · das ist ab jetzt die Basis: <strong>KW33 Sa 10 km</strong> · neuer 8-Wochen-Kalender aktiv</div>
 
-<div id="tab-overview" class="tab-content">
+<!-- ÜBERSICHT -->
+<div id="tab-overview" class="tab-content active">
   <div class="card">
-    <div class="card-title">Sa 8. August 2026 · KW32 · 🎉 Long Run 8,40km (Peak!)</div>
+    <div class="card-title">Heute · Sa 8. August 2026 · KW32 · 🎉 Long Run 8,404km (neuer Peak!)</div>
     <div class="metric-grid">
       <div class="metric-box"><div class="metric-val green">52.7</div><div class="metric-unit">ms</div><div class="metric-label">HRV 08.08. ✅ stark</div></div>
-      <div class="metric-box"><div class="metric-val green">132</div><div class="metric-unit">bpm avg</div><div class="metric-label">LR-HF ✅ komplett Z2</div></div>
-      <div class="metric-box"><div class="metric-val green">1.77</div><div class="metric-unit">h Deep</div><div class="metric-label">Deep 05.08. 🎉 Durchbruch</div></div>
-      <div class="metric-box"><div class="metric-val accent">54.14</div><div class="metric-unit">ml/kg/min</div><div class="metric-label">VO₂max Rekord (akt. 51.92)</div></div>
+      <div class="metric-box"><div class="metric-val green">52</div><div class="metric-unit">bpm</div><div class="metric-label">RHR 07.08. ✅ top</div></div>
+      <div class="metric-box"><div class="metric-val green">1.77</div><div class="metric-unit">h Deep</div><div class="metric-label">Deep 05.08. 🎉</div></div>
+      <div class="metric-box"><div class="metric-val green">54.14</div><div class="metric-unit">ml/kg/min</div><div class="metric-label">VO₂max Rekord 🔥 (akt. 51.92)</div></div>
     </div>
   </div>
+
+  <div class="card" style="border-color:#c7d2fe;background:#f8faff;">
+    <div class="card-title" style="color:var(--lr)">📐 Phase 1 neu kalibriert · Stand 08.08.2026</div>
+    <div class="analyse-highlight" style="background:#fef2f2;border-left-color:var(--red);">
+      <strong>Korrektur der Ausgangslage.</strong> Der Phasenplan aus Mai ging von ~12 km Long Run aus. Tatsächlich stehst du bei <strong>8,4 km</strong>. Ursache: die 952 Radeinheiten waren E-Bike-Pendelfahrten, kein Grundlagenvolumen — sie wurden fälschlich gewertet.
+    </div>
+    <div class="analyse-highlight">
+      <strong>Konsequenz:</strong> Phase 1 läuft bis <strong>Anfang Oktober 2026</strong> statt bis August. Alle Folgephasen rutschen ~8 Wochen nach hinten. <strong>Das Wettkampfziel 4:30–5:00 h am 25.04.2027 bleibt unverändert und realistisch.</strong>
+    </div>
+    <div class="analyse-highlight green">
+      <strong>Und die gute Nachricht:</strong> das Wochenvolumen wird deutlich freigegeben (Spannen statt Fixwerte, 10 % statt 8 % Limit), der Long Run steigt mit <strong>+1,5 km/Woche</strong> statt +1 km. Ende KW40 stehst du bei <strong>17,5 km</strong> — über der alten Phase-1-Marke von 18 km liegst du dann fast, nur von einer ehrlichen Basis aus.
+    </div>
+    <div class="stat-chips">
+      <span class="stat-chip" style="background:#e0e7ff;border-color:#c7d2fe;color:#4338ca">LR jetzt 8,4 km</span>
+      <span class="stat-chip accent">Ende KW40: 17,5 km</span>
+      <span class="stat-chip green">Ziel 32 km LR</span>
+      <span class="stat-chip">37 Wochen Restzeit</span>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:#c7d2fe;">
+    <div class="card-title">🗓️ Nächste Woche · KW33 (10.–16.08.) · 20–24 km</div>
+    <div class="plan-item"><div class="plan-day">Mo</div><div><div class="plan-desc">Kurzer Lauf · 4–6 km</div><div class="plan-sub">10.08. · Z2 120–138 bpm · ~28–42 min · Spanne: nach Tagesform wählen</div></div></div>
+    <div class="plan-item"><div class="plan-day" style="color:var(--kraft)">Mi</div><div><div class="plan-desc">Kräftigung · 20 min</div><div class="plan-sub">12.08. · Split Squats · Wadenheben · Glute Bridges — Pflicht, auch in Regenerationswochen</div></div></div>
+    <div class="plan-item"><div class="plan-day">Do</div><div><div class="plan-desc">Mittlerer Lauf · 6–8 km</div><div class="plan-sub">13.08. · Z2 · ~41–56 min</div></div></div>
+    <div class="plan-item"><div class="plan-day" style="color:var(--lr)">Sa</div><div><div class="plan-desc" style="color:var(--lr)">Long Run · <strong>10 km</strong> 🎯 erstmals zweistellig</div><div class="plan-sub">15.08. · ~72 min · Fixwert, keine Spanne, kein Endspurt · Long Run liegt fest auf Samstag</div></div></div>
+    <div style="font-size:11.5px;color:var(--text-sub);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">So 09.08.: Ruhetag oder ganz locker — gestern war Peak-Tag.</div>
+  </div>
+
+  <div class="card"><div class="card-title">Wochenvolumen (km) · Ist + Plan</div><div class="chart-wrap" style="height:150px"><canvas id="volChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">Blau = gelaufen · Violett = Plan · Gelb = Regenerationswoche. Steigerung max. 10 %/Woche bis 40 km.</div></div>
+
   <div class="card">
-    <div class="card-title">KW32 · 13,62 / 17,5 km · läuft · 🎉 neuer LR-Peak</div>
-    <div class="prog-row"><div class="prog-label"><span>KW32 🏃 läuft</span><span class="sub">13,62 / 17,5 km · Mi 5,22 + Sa LR 8,40km 🎉 · So evtl. locker</span></div><div class="prog-track"><div class="prog-fill" style="width:78%"></div></div></div>
-    <div class="prog-row"><div class="prog-label"><span>Long Run Peak 🏃</span><span class="sub">8,404 km (08.08.) · alter Peak 7,752km übertroffen!</span></div><div class="prog-track"><div class="prog-fill green" style="width:100%"></div></div></div>
+    <div class="card-title">KW32 · 13,62 km · 🎉 LR-Peak · KW31 ✅ 18,01 km</div>
+    <div class="prog-row"><div class="prog-label"><span>KW32 🏃</span><span class="sub">13,62 km · Mi Z2 5,22 + Sa LR 8,40 km 🎉 · 2 Läufe</span></div><div class="prog-track"><div class="prog-fill" style="width:78%"></div></div></div>
+    <div class="prog-row"><div class="prog-label"><span>KW31 ✅</span><span class="sub">18,01 km · Referenzwoche für die 10 %-Steigerung</span></div><div class="prog-track"><div class="prog-fill green" style="width:100%"></div></div></div>
     <div class="prog-row"><div class="prog-label"><span>Gesamt</span><span class="sub">180,451 km · 36 Läufe · seit 07.05.2026</span></div><div class="prog-track"><div class="prog-fill green" style="width:100%"></div></div></div>
   </div>
-  <div class="card"><div class="card-title">Wochenvolumen (km)</div><div class="chart-wrap" style="height:140px"><canvas id="volChart"></canvas></div></div>
+
   <div class="card">
-    <div class="card-title">KW31 Rückblick ✅ — 18,01km · 🎉 neuer LR-Peak</div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#16a34a">Di ✓</div><div><div class="plan-desc plan-done" style="color:#16a34a">Z2-Lauf ✅ · 6,177km</div><div class="plan-sub plan-done">28.07. · 7:16/km · avgHR 136 ob. Z2</div></div></div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#16a34a">Fr ✓</div><div><div class="plan-desc plan-done" style="color:#16a34a">Z2-Lauf ✅ · 4,082km</div><div class="plan-sub plan-done">31.07. · 7:07/km · avgHR 137 ob. Z2</div></div></div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#16a34a">So ✓</div><div><div class="plan-desc plan-done" style="color:#16a34a">Long Run ✅ · 7,752km 🏃</div><div class="plan-sub plan-done">02.08. · 6:59/km · avgHR 130 ✅ Z2 · damals neuer Peak (jetzt 8,404km)</div></div></div>
+    <div class="card-title">KW28 Rückblick ✅ (06.07.–12.07.) · 15,25km — Ziel getroffen! 🎯</div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Mo ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub plan-done">06.07. · HRV 38.7ms ✅ · Radfahren 🚴</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#4338ca">Di ✓</div><div><div class="plan-desc plan-done" style="color:#4338ca">Z2-Lauf ✅ · 5,03km</div><div class="plan-sub plan-done">07.07. · Pace 6:33/km · Power 189W · VO₂max 53.49 · 09:48 Uhr</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Mi/Do ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetage ✓</div><div class="plan-sub plan-done">08.–09.07. · HRV 30.5→38.8ms · Schlaf 09.07. 7.11h ✅ (Deep 1.58h)</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#4338ca">Fr ✓</div><div><div class="plan-desc plan-done" style="color:#4338ca">Z2-Lauf ✅ · 4,54km 🌙</div><div class="plan-sub plan-done">10.07. · Pace 6:52/km · avgHR 125bpm ✅ Z2 · VO₂max 54.04 🔥 · 18:09 Uhr</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#4338ca">So ✓</div><div><div class="plan-desc plan-done" style="color:#4338ca">Long Run ✅ · 5,69km</div><div class="plan-sub plan-done">12.07. · Pace 7:07/km · avgHR 137bpm ✅ ob. Z2 · Schlaf 8,82h 🔥 · KW28 = 15,25km ✅</div></div></div>
   </div>
   <div class="card">
-    <div class="card-title">Wochenplan KW32 (03.08.–09.08.2026) — läuft · 13,62km · 🎉 Peak</div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Mo–Di ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetage ✓</div><div class="plan-sub">03.–04.08. · HRV 47.6 / 44.9ms ✅ · Erholung nach LR</div></div></div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Di ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub">05.08. · HRV 45.2ms ✅ · Deep 1,77h 🎉 Durchbruch!</div></div></div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#16a34a">Mi ✓</div><div><div class="plan-desc plan-done" style="color:#16a34a">Z2-Lauf ✅ · 5,219km</div><div class="plan-sub">06.08. · 7:07/km · avgHR 129 ✅ Z2 · maxHR 142 · 08:06 Uhr · Deep 1,52h ✅</div></div></div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Do/Fr ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetage ✓</div><div class="plan-sub">07.08. · HRV 41.4ms ✅ · RHR 52</div></div></div>
-    <div class="plan-item"><div class="plan-day plan-done" style="color:#16a34a">Sa ✓</div><div><div class="plan-desc plan-done" style="color:#16a34a">Long Run ✅ · 8,404km 🎉 NEUER PEAK</div><div class="plan-sub">08.08. · 7:13/km · avgHR 132 ✅ Z2 · maxHR nur 141 (komplett Z2!) · 60:36 min · 08:41 Uhr · HRV 52,7</div></div></div>
+    <div class="card-title">KW29 Rückblick ✅ (13.–19.07.) — voll 16,67km</div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Mo ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub">13.07. · HRV 46.0ms ✅ · Laufanalyse bei Lunge 🏃</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#16a34a">Di ✓</div><div><div class="plan-desc plan-done" style="color:#16a34a">Z2-Lauf ✅ · 3,765km</div><div class="plan-sub">14.07. · Pace 6:26/km · HR 131 ✅ Z2 · VO₂max 54.14 🔥 REKORD · 06:44 Uhr</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Mi ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub">15.07. · HRV 28.3ms ⚠️ (1 Tag) · RHR 58 · kein Alarm</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#16a34a">Do ✓</div><div><div class="plan-desc plan-done" style="color:#16a34a">Z2-Lauf lang ✅ · 6,887km 🏃</div><div class="plan-sub">16.07. · Pace ~6:55/km · avgHR 134 ✅ ob. Z2 · maxHR 146 · 47:36 min · 07:51 Uhr · fast LR!</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#6b7280">Fr ✓</div><div><div class="plan-desc plan-done" style="color:#6b7280">Ruhetag ✓</div><div class="plan-sub">17.07. · HRV 38.2ms ✅ · RHR 56</div></div></div>
+    <div class="plan-item"><div class="plan-day plan-done" style="color:#16a34a">Sa ✓</div><div><div class="plan-desc plan-done" style="color:#16a34a">Z2-Lauf ✅ · 6,015km</div><div class="plan-sub">18.07. · Pace ~6:45/km · avgHR 131 ✅ Z2 · maxHR 142 · 41:24 min · 10:41 Uhr</div></div></div>
   </div>
 </div>
 
-<div id="tab-analyse" class="tab-content">
+<!-- KALENDER -->
+<div id="tab-calendar" class="tab-content">
 
+  <div class="card">
+    <div class="card-title">🪜 Die Long-Run-Leiter · Ist 8,4 km → KW40 17,5 km</div>
+    <div style="font-size:12.5px;color:var(--text-sub);line-height:1.6;">Neun Sprossen, +1,5 km pro Aufbauwoche. Schraffiert = Regeneration — das Absacken ist gewollt und der Grund, warum die Kurve danach weiter trägt. Tippe eine Sprosse an, um die Woche zu öffnen.</div>
+    <div class="ladder" id="ladder"></div>
+    <div class="ladder-axis" id="ladder-axis"></div>
+    <div class="legend">
+      <span><i style="background:#16a34a"></i>gelaufen</span>
+      <span><i style="background:#4338ca"></i>Long Run Plan</span>
+      <span><i style="background:#9ca3af"></i>Regeneration</span>
+    </div>
+  </div>
+
+  <div class="analyse-highlight" style="background:#fff5f3;border-left-color:var(--kraft);margin-bottom:12px;">
+    <strong style="color:var(--kraft)">Spannen statt Fixwerte.</strong> Mo und Do haben eine Ober- und Untergrenze — fühlst du dich gut, nimm das obere Ende. Der Long Run bleibt eine feste Zahl: die <em>einzelne lange Belastung</em> ist das Patellasehnen-Risiko, nicht das Wochenvolumen. Am Samstag wird nicht improvisiert.
+  </div>
+
+  <div class="card-title" style="padding-left:2px;">8 Wochen voraus · KW33–KW40</div>
+  <div id="wk-host"></div>
+
+  <div class="card">
+    <div class="card-title">📍 Meilensteine</div>
+    <div class="ms-row"><div class="ms-date">Sa 15.08.</div><div><strong>Erster zweistelliger Long Run</strong> (10 km) seit dem Halbmarathon 2024.</div></div>
+    <div class="ms-row"><div class="ms-date">Sa 22.08.</div><div><strong>Über 80 Minuten am Stück</strong> (11,5 km ≈ 82 min) → ab hier <strong>Wasser mitführen</strong>.</div></div>
+    <div class="ms-row"><div class="ms-date">Sa 29.08.</div><div><strong>Über 90 Minuten</strong> (13 km ≈ 93 min) → <strong>Start DIY-Elektrolytgetränk</strong> nach der Rezeptur aus dem Essensplan. Erster Schluck nach 45 Minuten, <em>nicht</em> nach Durstgefühl.</div></div>
+    <div class="ms-row"><div class="ms-date">ab KW38</div><div>Bulgarian Split Squats <strong>mit Zusatzgewicht</strong>.</div></div>
+    <div class="ms-row"><div class="ms-date">Sa 26.09.</div><div><strong>17,5 km — längster Lauf seit dem Halbmarathon 2024.</strong> Frühstücksroutine gemäß Essensplan anwenden.</div></div>
+    <div class="ms-row"><div class="ms-date">ab 05.10.</div><div><strong>Phase 2 beginnt:</strong> vierter Lauftag, erste Tempoarbeit in Zone 3, Halbmarathon als Testwettkampf im Frühjahr 2027.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📏 Die Regeln (gelten dauerhaft)</div>
+    <div class="rule-row"><div class="rule-id">R1</div><div>Der Kalender zeigt <strong>immer mindestens 8 Wochen im Voraus</strong> — rollierend, nicht statisch.</div></div>
+    <div class="rule-row"><div class="rule-id">R2</div><div><strong>Long Run liegt fest auf Samstag.</strong> Keine Verschiebung ohne Rücksprache.</div></div>
+    <div class="rule-row"><div class="rule-id">R3</div><div><strong>Wochenläufe als Spanne</strong> (z.&nbsp;B. 4–6 km). Du entscheidest nach Tagesform innerhalb der Spanne.</div></div>
+    <div class="rule-row"><div class="rule-id">R4</div><div><strong>Der Long Run bleibt ein Fixwert.</strong> Keine Spanne, keine spontane Verlängerung.</div></div>
+    <div class="rule-row"><div class="rule-id">R5</div><div>Steigerungslimit Wochenvolumen: <strong>10 %/Woche</strong> bis 40 km/Woche, danach zurück auf 8 %.</div></div>
+    <div class="rule-row"><div class="rule-id">R6</div><div>Jede 4. Woche ist <strong>Regenerationswoche</strong> (−30 bis −35 % Volumen). Die Kräftigung läuft normal weiter.</div></div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--text-sub);line-height:1.6;">
+      <strong style="color:var(--text)">Wochenstruktur:</strong> Mo kurz · Di frei · Mi Kräftigung · Do mittel · Fr frei · <strong style="color:var(--lr)">Sa Long Run</strong> · So frei<br>
+      <strong style="color:var(--text)">Intensität Phase 1:</strong> durchgehend Zone 2 · 120–138 bpm · Pace 6:30–7:05/km
+    </div>
+  </div>
+
+  <div class="card" style="border-color:#fecaca;">
+    <div class="card-title" style="color:var(--red)">🛑 Die Reißleine · Patellasehne</div>
+    <div style="font-size:12.5px;color:var(--text-sub);line-height:1.6;margin-bottom:10px;">Bei <strong style="color:var(--text)">einem</strong> dieser Zeichen greift die Regel automatisch:</div>
+    <div class="wd-item"><div class="wd-dot red"></div><div class="wd-text">Ziehen oder Druck <strong>direkt unterhalb der Kniescheibe</strong> — während oder nach dem Lauf</div></div>
+    <div class="wd-item"><div class="wd-dot red"></div><div class="wd-text">Steifheit an genau dieser Stelle bei den <strong>ersten Schritten am Folgemorgen</strong></div></div>
+    <div class="wd-item"><div class="wd-dot red"></div><div class="wd-text">Beschwerden, die beim <strong>Treppabgehen</strong> deutlicher sind als beim Treppaufgehen</div></div>
+    <div class="analyse-highlight red" style="margin:12px 0 0;">
+      <strong>Maßnahme:</strong> nächster Long Run −30 % · Wochenläufe ans untere Ende der Spanne · Kräftigung bleibt unverändert. Keine Ausnahme, keine Einzelfallabwägung. <em>Das ist die Gegenleistung dafür, dass das Steigerungslimit angehoben wurde.</em><br>
+      <span style="color:var(--text-sub);font-size:12px;">Hintergrund: die Reizung 2024 kam von <strong>einer einzelnen langen Belastung</strong> — nicht von hohem Wochenvolumen.</span>
+    </div>
+  </div>
+
+  <div class="card-title" style="padding-left:2px;">Tagesansicht · 8 Wochen · Termine hinzufügen mit +</div>
+  <div id="kal-container"></div>
+  <div class="card"><div class="card-title">Alle Termine</div><div id="termin-list-all" class="termin-list"><div style="color:var(--text-sub);font-size:12px;">Noch keine Termine.</div></div></div>
+</div>
+
+<!-- TRAINING -->
+<div id="tab-training" class="tab-content">
+  <div class="card">
+    <div class="card-title">Alle Läufe Phase 1</div>
+    <table class="run-table">
+      <thead><tr><th>Datum</th><th>Typ</th><th>km</th><th>Pace</th><th>Info</th></tr></thead>
+      <tbody>
+        <tr><td>06.05.</td><td>Z2</td><td>4.59</td><td>~7:30/km</td><td>Erster Lauf</td></tr>
+        <tr><td>10.05.</td><td>Long Run</td><td>7.02</td><td>~7:30/km</td><td>Peak 7km 💪</td></tr>
+        <tr><td>24.05.</td><td>Long Run</td><td>5.45</td><td>7:15/km</td><td>KW21 ✅</td></tr>
+        <tr><td>09.06.</td><td>Long Run</td><td>4.31</td><td>6:45/km</td><td>VO₂max 53.11 🔥 · Schlaf 6.8h ✅</td></tr>
+        <tr><td>14.06.</td><td>Long Run</td><td>5.66</td><td>6:25/km</td><td>HRV 43.8ms ✅ · RHR 48 ✅ TOP!</td></tr>
+        <tr><td>19.06.</td><td>Z2</td><td>4.715</td><td>6:31/km</td><td>VO₂max 53.66 🔥 · 05:47 Uhr</td></tr>
+        <tr><td>21.06.</td><td>Long Run</td><td>7.058</td><td>6:55/km</td><td>LR Peak 🏃 · HRV 67.5ms 🔥🔥</td></tr>
+        <tr><td>23.06.</td><td>Z2</td><td>4.647</td><td>6:27/km</td><td>VO₂max 53.87 🔥 REKORD!</td></tr>
+        <tr><td>25.06.</td><td>Z2</td><td>4.573</td><td>6:41/km</td><td>VO₂max 53.9 🔥 NEUER REKORD! 🌡️</td></tr>
+        <tr><td>01.07. ✓</td><td>Z2</td><td>4.384</td><td>6:32/km</td><td>HR 129 ✅ Z2 · VO₂max 53.76 · 18:27 Uhr 🌙 Abendlauf</td></tr>
+        <tr><td>05.07. ✓</td><td>Long Run</td><td>5.065</td><td>Z2</td><td>VO₂max 53.11 · KW27 abgeschlossen 9,449km ✅</td></tr>
+        <tr><td>07.07. ✓</td><td>Z2</td><td>5.029</td><td>6:33/km</td><td>Power 189W · Stride 0.958m · VO₂max 53.49 · 09:48 Uhr</td></tr>
+        <tr><td>10.07. ✓</td><td>Z2 🌙</td><td>4.536</td><td>6:52/km</td><td>avgHR 125 ✅ Z2 · Power 178W · GCT 286ms · VO₂max 54.04 🔥 · 18:09 Uhr</td></tr>
+        <tr><td>12.07. ✓</td><td>Long Run</td><td>5.688</td><td>7:07/km</td><td>avgHR 137 ✅ ob. Z2 · Power 175W · GCT 281ms · Schlaf 8,82h 🔥 · KW28 = 15,25km ✅</td></tr>
+        <tr><td><strong>14.07. ✓</strong></td><td>Z2</td><td><strong>3.765</strong></td><td>6:26/km</td><td>HR 131 ✅ Z2 · maxHR 141 · Power 194W · Stride 0.975m · VO₂max 54.14 🔥 REKORD! · 06:44 Uhr</td></tr>
+        <tr><td><strong>16.07. ✓</strong></td><td>Z2 lang</td><td><strong>6.887</strong></td><td>~6:55/km</td><td>avgHR 134 ✅ ob. Z2 · maxHR 146 · 47:36 min · VO₂max 53.9 · 07:51 Uhr · fast LR-Länge 🏃</td></tr>
+        <tr><td><strong>18.07. ✓</strong></td><td>Z2</td><td><strong>6.015</strong></td><td>~6:45/km</td><td>avgHR 131 ✅ Z2 · maxHR 142 · 41:24 min · VO₂max 53.61 · 10:41 Uhr</td></tr>
+        <tr><td><strong>24.07. ✓</strong></td><td>Z2 (Deload)</td><td><strong>4.492</strong></td><td>6:38/km</td><td>avgHR 130 ✅ Z2 · maxHR 138 · 29:48 min · VO₂max 53.18 · 16:38 Uhr</td></tr>
+        <tr><td><strong>26.07. ✓</strong></td><td>Z2 (Deload)</td><td><strong>5.505</strong></td><td>6:59/km</td><td>avgHR 130 ✅ Z2 · maxHR 155 (kurz) · 38:24 min · VO₂max 53.28 · 10:34 Uhr</td></tr>
+        <tr><td><strong>28.07. ✓</strong></td><td>Z2</td><td><strong>6.177</strong></td><td>7:16/km</td><td>avgHR 136 ✅ ob. Z2 · maxHR 150 · 44:54 min · VO₂max 53.13 · 12:25 Uhr · KW31-Start</td></tr>
+        <tr><td><strong>31.07. ✓</strong></td><td>Z2</td><td><strong>4.082</strong></td><td>7:07/km</td><td>avgHR 137 ✅ ob. Z2 · maxHR 146 · 29:06 min · VO₂max 52.67 · 17:55 Uhr</td></tr>
+        <tr><td><strong>02.08. ✓</strong></td><td>Long Run 🎉</td><td><strong>7.752</strong></td><td>6:59/km</td><td>avgHR 130 ✅ Z2 · maxHR 158 (kurz) · 54:12 min · VO₂max 52.76 · 10:53 Uhr · NEUER PEAK (alt 7.058)</td></tr>
+        <tr><td><strong>06.08. ✓</strong></td><td>Z2</td><td><strong>5.219</strong></td><td>7:07/km</td><td>avgHR 129 ✅ Z2 · maxHR 142 · 37:12 min · VO₂max 52.63 · 08:06 Uhr</td></tr>
+        <tr style="background:#e0e7ff"><td><strong>08.08. ✓</strong></td><td>Long Run 🎉</td><td><strong>8.404</strong></td><td>7:13/km</td><td>avgHR 132 ✅ Z2 · maxHR nur 141 (komplett Z2!) · 60:36 min · VO₂max 51.92 · 08:41 Uhr · NEUER PEAK (alt 7.752) · <strong>Basis des neuen Plans</strong></td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;color:var(--text-sub);margin-top:8px;">KW32: 13,623km · KW31 ✅: 18,011km · Gesamt: 180,451km · 36 Läufe (seit 07.05.) · LR Peak: 8.404km 🎉 · VO₂max REKORD 54.14 🔥</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🧠 Warum die Sehne die Bremse ist — nicht die Lunge</div>
+    <div class="analyse-text">
+      Dein <strong>kardiovaskuläres System ist deutlich weiter</strong> als dein Bewegungsapparat (Halbmarathon 2:13:54 im März 2024, aerobe Restadaptation vorhanden). Herz-Kreislauf passt sich in <strong>Tagen</strong> an, Muskulatur in <strong>Wochen</strong>, Sehnen und Bindegewebe in <strong>Monaten</strong>. Genau diese Lücke erzeugt das Gefühl „ich könnte mehr" — und du hast recht damit, nur eben nicht in dem Gewebe, das zuerst reißt.
+      <div style="margin-top:10px;">Deshalb die Aufteilung: <strong>Wochenvolumen deutlich freigegeben</strong> (viele kurze Einzelbelastungen = geringes Sehnenrisiko), <strong>Long Run schneller steigend als bisher, aber ohne Spielraum nach oben</strong>. Läufe vorzeitig abzubrechen, weil der Plan bremst, ist kein Disziplinproblem — es war ein Planproblem. Das ist jetzt behoben.</div>
+    </div>
+  </div>
+
+  <div class="card"><div class="card-title">VO₂max Entwicklung</div><div class="chart-wrap" style="height:160px"><canvas id="vo2Chart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;text-align:center;">Aktuell: <strong style="color:var(--accent)">51.92 ml/kg/min</strong> (Sa 08.08.) · Rekord: <strong style="color:var(--green)">54.14 🔥 (Di 14.07.)</strong> · Trend: 52.76 → 52.63 → 51.92 (nach LR) · Ziel: 55+</div></div>
+  <div class="card"><div class="card-title">HR-Zonen (Alle Läufe)</div><div class="chart-wrap" style="height:180px"><canvas id="zoneChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">Z2 Zielzone: 120–138 bpm · Pace 7:00–8:00/km</div></div>
+</div>
+
+<!-- SCHLAF & HRV -->
+<div id="tab-sleep" class="tab-content">
+  <div class="card" style="border-color:#c7d2fe;background:#f8faff;">
+    <div class="card-title" style="color:var(--lr)">🎯 Offener Punkt: Schlafdauer — der größte Hebel</div>
+    <div class="metric-grid three">
+      <div class="metric-box"><div class="metric-val yellow">6:12</div><div class="metric-unit">h Ø</div><div class="metric-label">aktuell</div></div>
+      <div class="metric-box"><div class="metric-val accent">6:42</div><div class="metric-unit">h Ø</div><div class="metric-label">Ziel (+30 min)</div></div>
+      <div class="metric-box"><div class="metric-val green">41</div><div class="metric-unit">ms</div><div class="metric-label">HRV Ø</div></div>
+    </div>
+    <div class="analyse-text">
+      Mit steigendem Trainingsreiz wird die Schlafdauer zum limitierenden Faktor — die Anpassung findet <strong>überwiegend im Schlaf</strong> statt, nicht beim Laufen. Ziel für die kommenden Wochen: <strong>+30 min im Schnitt</strong>.
+      <div style="margin-top:8px;color:var(--lr);font-weight:600;">Dieser Hebel ist voraussichtlich größer als jeder zusätzliche Trainingskilometer.</div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-sub);">Konkret: vor 23:30 ins Bett. Die Wochen mit früher Schlafenszeit zeigen 7,4–7,7 h und stabile HRV; zwei späte Nächte drücken auf ~5,3 h und die HRV an die Schwelle. Kein Trainingsproblem — ein Schlafenszeit-Problem.</div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title">😴 Schlaf letzte Nächte (h)</div><div class="chart-wrap" style="height:160px"><canvas id="sleepChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">03.–07.08.: 6.26 → 5.33 → 5.8 → 6.62h — Dauer eher kurz, ABER 🎉 Deep Sleep durchgebrochen (05.08. 1,77h · 06.08. 1,52h ✅) · Ziel: Dauer wieder hoch · 🟢 ≥7h &nbsp;🔵 6–7h &nbsp;🟡 5–6h &nbsp;🔴 &lt;5h</div></div>
+  <div class="card">
+    <div class="card-title">💜 HRV – Herzratenvariabilität <span style="font-size:10px;font-weight:400;color:var(--text-sub);">Schwelle: 30ms</span></div>
+    <div class="chart-wrap" style="height:160px"><canvas id="hrvChart"></canvas></div>
+    <div style="font-size:11px;color:var(--text-sub);margin-top:8px;">HRV 03.–07.08.: <strong style="color:var(--green)">47.6 / 44.9 / 45.2 / 45.7 / 41.4ms ✅</strong> stark · 02.08.-Dip auf 41.5 revidiert (kein echter Dip) · Schwelle: 30ms · Erholung top</div>
+    <div style="margin-top:10px;padding:10px 12px;background:#f5f3ff;border-radius:8px;border-left:3px solid #7c3aed;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#7c3aed;margin-bottom:4px;">Was ist HRV &amp; warum wichtig?</div>
+      <div style="font-size:12px;color:#4b5563;line-height:1.6;">HRV misst die Schwankung zwischen Herzschlägen. <strong>Hohe HRV</strong> = Nervensystem erholt, Körper bereit für Belastung. <strong>Niedrige HRV</strong> = Stress oder Übertraining. Als Läufer ist HRV der früheste Frühwarnindikator.<br><span style="color:#7c3aed;font-weight:600;">≥ 30ms = grünes Licht · &lt; 30ms an 2+ Tagen = Training reduzieren</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">❤️ Ruheherzfrequenz (RHR) <span style="font-size:10px;font-weight:400;color:var(--text-sub);">Ziel: &lt;55 bpm</span></div>
+    <div class="chart-wrap" style="height:140px"><canvas id="rhrChart"></canvas></div>
+    <div style="font-size:11px;color:var(--text-sub);margin-top:8px;">RHR 03.–07.08.: <strong style="color:var(--green)">52–55 bpm ✅</strong> · durchgehend top im Normalbereich</div>
+    <div style="margin-top:10px;padding:10px 12px;background:#f0fdf4;border-radius:8px;border-left:3px solid #16a34a;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#16a34a;margin-bottom:4px;">Was ist RHR &amp; warum wichtig?</div>
+      <div style="font-size:12px;color:#4b5563;line-height:1.6;">Die Ruheherzfrequenz = Herzschläge pro Minute morgens im Ruhezustand. <strong>Niedriger = besser</strong>: Trainierter Herzmuskel pumpt mehr Blut pro Schlag. Steigt RHR um ≥5 bpm über deinen Normalwert, signalisiert das Erschöpfung, Krankheit oder Übertraining.<br><span style="color:#16a34a;font-weight:600;">Dein Ziel: &lt; 55 bpm · &lt; 50 bpm = Ausgezeichnet 🔥 (So 14.06. = 48 bpm!)</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- WATCHDOG -->
+<div id="tab-watchdog" class="tab-content">
+  <div class="card">
+    <div class="card-title">Watchdog Status</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span class="badge green" style="font-size:14px;padding:4px 14px;">✅ GRÜN</span><span style="font-size:12px;color:var(--text-sub)">8. August 2026 — KW32 · HRV die Woche stark (41–48ms) · 🎉 Deep-Sleep-Durchbruch · RHR 52 ✅ · alles top</span></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">HRV ✅ durchgehend stark</div><div class="wd-sub">03.–07.08.: 47.6 / 44.9 / 45.2 / 45.7 / 41.4ms ✅ · 02.08.-Dip auf 41.5 revidiert (kein echter Dip)</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">🎉 Deep Sleep durchgebrochen</div><div class="wd-sub">05.08. 1,77h · 06.08. 1,52h ✅ — die höchsten Werte seit Langem! Der lange offene Punkt löst sich</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">RHR ✅ top</div><div class="wd-sub">03.–07.08. durchgehend 52–55 bpm · alles im Normalbereich</div></div></div>
+    <div class="wd-item"><div class="wd-dot yellow"></div><div><div class="wd-text">Schlaf-Dauer diese Woche kurz</div><div class="wd-sub">05.–07.08. nur 5.3–6.6h (Deep dafür top) · Ziel: Dauer wieder >7h, Ø +30 min</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Patellasehne unauffällig</div><div class="wd-sub">Keines der drei Reißleinen-Zeichen gemeldet · LR 08.08. über 60 min beschwerdefrei</div></div></div>
+    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Keine 2 Tage HRV &lt; 30ms</div><div class="wd-sub">Mi 15.07. 28.3ms war 1 Tag → kein Alarm ✓ · Do sofort wieder 42.0ms · Schwelle: 30ms</div></div></div>
+  </div>
+
+  <div class="card" style="border-color:#fecaca;">
+    <div class="card-title" style="color:var(--red)">🛑 Reißleine Patellasehne — täglich gegenprüfen</div>
+    <div class="wd-item"><div class="wd-dot red"></div><div><div class="wd-text">Ziehen oder Druck direkt unterhalb der Kniescheibe</div><div class="wd-sub">während oder nach dem Lauf</div></div></div>
+    <div class="wd-item"><div class="wd-dot red"></div><div><div class="wd-text">Steifheit an genau dieser Stelle am Folgemorgen</div><div class="wd-sub">bei den ersten Schritten nach dem Aufstehen</div></div></div>
+    <div class="wd-item"><div class="wd-dot red"></div><div><div class="wd-text">Treppab schmerzhafter als treppauf</div><div class="wd-sub">klassisches Zeichen einer Patellasehnenreizung</div></div></div>
+    <div class="analyse-highlight red" style="margin:12px 0 0;"><strong>Bei einem einzigen dieser Zeichen:</strong> nächster Long Run −30 %, Wochenläufe ans untere Ende der Spanne, Kräftigung bleibt. Kein Verhandeln. Das ist der Preis dafür, dass die Decke angehoben wurde.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Trainer-Empfehlung Sa 08.08.</div>
+    <div style="font-size:13px;line-height:1.8;"><strong>Top-Erholungswoche.</strong> HRV stark (41–48ms), RHR 52 — und der <strong>🎉 Deep Sleep ist durchgebrochen</strong> (05.08. 1,77h, 06.08. 1,52h). Genau der Punkt, an dem wir wochenlang dran waren.<br><strong>Highlight:</strong> Sa 08.08. <strong>neuer Long-Run-Peak 8,404 km — komplett Zone 2</strong> (maxHR nur 141 über 60 min). Sauberer geht ein Long Run nicht.<br><strong>Plan:</strong> So 09.08. höchstens locker · ab KW33 läuft der neue 8-Wochen-Kalender: <strong>Sa 15.08. 10 km</strong> · Schlafdauer Ø +30 min.<br>180,451 km · 36 Läufe · VO₂max Rekord 54.14 · LR-Peak 8,404 km 🎉</div>
+  </div>
+</div>
+
+<!-- ANALYSE -->
+<div id="tab-analyse" class="tab-content">
   <div class="card">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
       <div>
         <div style="font-size:18px;font-weight:800;">📋 Samstag, 8. August 2026</div>
-        <div style="font-size:12px;color:var(--text-sub);margin-top:2px;">KW32 · HRV stark (41–48ms) · 🎉 Deep-Sleep-Durchbruch · RHR 52 ✅ · Watchdog GRÜN</div>
+        <div style="font-size:12px;color:var(--text-sub);margin-top:2px;">KW32 · Phase 1 neu kalibriert · HRV stark · 🎉 Deep-Sleep-Durchbruch · Watchdog GRÜN</div>
       </div>
       <span class="badge green" style="margin-left:auto;font-size:13px;padding:3px 12px;">✅ GRÜN</span>
     </div>
-    <div class="analyse-highlight" style="background:#eef2ff;border-left:3px solid #4338ca;">
-      🎉 <strong>Deep-Sleep-Durchbruch!</strong> Der lange offene Punkt löst sich: 05.08. <strong>1,77h</strong> und 06.08. 1,52h Tiefschlaf — die höchsten Werte seit Wochen. Genau das, woran wir dran waren.
-    </div>
     <div class="analyse-highlight green">
-      ✅ <strong>HRV die ganze Woche stark</strong> (03.–07.08.: 47,6 / 44,9 / 45,2 / 45,7 / 41,4ms). Und wieder bestätigt: der 02.08.-„Dip" (30,8) wurde auf 41,5ms revidiert — war also gar keiner. RHR durchgehend top (52–55).
+      🎉 <strong>Deep-Sleep-Durchbruch!</strong> 05.08. 1,77h und 06.08. 1,52h Tiefschlaf — die höchsten Werte seit Wochen. Der lange offene Punkt löst sich endlich.
+    </div>
+    <div class="analyse-highlight yellow">
+      ✅ <strong>HRV die Woche stark</strong> (03.–07.08.: 47,6/44,9/45,2/45,7/41,4ms) · 02.08.-„Dip" (30,8) auf 41,5 revidiert — war keiner. RHR top (52–55).
     </div>
     <div class="stat-chips">
       <span class="stat-chip green">HRV 41–48ms ✅</span>
       <span class="stat-chip" style="background:#e0e7ff;border-color:#c7d2fe;color:#4338ca">🎉 Deep 1,77h</span>
       <span class="stat-chip green">RHR 52 ✅</span>
       <span class="stat-chip" style="background:#e0e7ff;border-color:#c7d2fe;color:#4338ca">🎉 LR-Peak 8,40km</span>
-      <span class="stat-chip accent">180,451km ges.</span>
+      <span class="stat-chip accent">180,451km gesamt</span>
     </div>
   </div>
 
   <div class="card">
-    <div class="analyse-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-sub);margin-bottom:10px;">🏃 Long Run · Sa 08.08. 🎉</div>
+    <div class="analyse-label">🏃 Long Run · Sa 08.08. 🎉</div>
     <div class="analyse-row"><span class="lbl">Distanz / Pace</span><span class="val" style="color:#4338ca;font-weight:700">8.404km @ 7:13/km · NEUER PEAK</span></div>
     <div class="analyse-row"><span class="lbl">Herzfrequenz</span><span class="val green">avg 132 bpm ✅ Z2 · max nur 141 (komplett Z2!)</span></div>
     <div class="analyse-row"><span class="lbl">Dauer / Uhrzeit</span><span class="val">60:36 min · 08:41 Uhr (früh 🌅)</span></div>
     <div class="analyse-row"><span class="lbl">VO₂max</span><span class="val accent">51.92 · Rekord 54.14 hält</span></div>
-    <div class="analyse-text" style="margin-top:10px;">Der sauberste Long Run bisher: <strong>8,404km komplett in Zone 2</strong> — maxHR nur 141 über die ganze Stunde. Das ist genau die aerobe Basis, die wir für den Marathon aufbauen. Alter Peak (7,752km) klar übertroffen, und das kontrolliert.</div>
+    <div class="analyse-text" style="margin-top:10px;">Der sauberste Long Run bisher: <strong>8,404km komplett in Zone 2</strong> — maxHR nur 141 über die ganze Stunde. Genau die aerobe Basis, die wir für den Marathon aufbauen. Alter Peak (7,752km) klar und kontrolliert übertroffen. <strong>Dieser Wert ist die Basis des neuen 8-Wochen-Kalenders.</strong></div>
   </div>
 
   <div class="card">
-    <div class="analyse-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-sub);margin-bottom:10px;">💪 Erholung & Körper</div>
-    <div class="analyse-row"><span class="lbl">HRV 04.–08.08.</span><span class="val green">44.9 / 45.2 / 45.7 / 41.4 / 52.7ms ✅ stark</span></div>
-    <div class="analyse-row"><span class="lbl">HRV 02.08. (revidiert)</span><span class="val green">30.8 → 41.5ms — kein echter Dip</span></div>
-    <div class="analyse-row"><span class="lbl">RHR 03.–07.08.</span><span class="val green">52–55 bpm ✅ durchgehend top</span></div>
-    <div class="analyse-row"><span class="lbl">🎉 Deep Sleep</span><span class="val" style="color:#4338ca;font-weight:700">05.08. 1,77h · 06.08. 1,52h ✅</span></div>
-    <div class="analyse-row"><span class="lbl">Schlaf-Dauer</span><span class="val yellow">05.–07.08. 5,3–6,6h — eher kurz</span></div>
-    <div class="analyse-text" style="margin-top:10px;">Die Erholungslandschaft ist top: HRV stark, RHR niedrig, und der <strong>Deep Sleep ist endlich da</strong> (1,77h!). Interessant: die guten Deep-Sleep-Nächte kamen trotz eher kurzer Gesamtdauer. Nächstes Ziel ist also, die Dauer wieder über 7h zu bringen — dann hast du beides zusammen, und die Erholung ist komplett.</div>
+    <div class="analyse-label">📐 Was sich am Plan geändert hat</div>
+    <div class="analyse-row"><span class="lbl">Long-Run-Steigerung</span><span class="val accent">+1,0 → <strong>+1,5 km/Woche</strong></span></div>
+    <div class="analyse-row"><span class="lbl">Volumenlimit</span><span class="val accent">8 % → <strong>10 %/Woche</strong> (bis 40 km)</span></div>
+    <div class="analyse-row"><span class="lbl">Wochenläufe</span><span class="val accent">Fixwerte → <strong>Spannen</strong></span></div>
+    <div class="analyse-row"><span class="lbl">Long Run Wochentag</span><span class="val accent">variabel → <strong>Samstag fix</strong></span></div>
+    <div class="analyse-row"><span class="lbl">Kalenderhorizont</span><span class="val accent">1 Woche → <strong>8 Wochen rollierend</strong></span></div>
+    <div class="analyse-row"><span class="lbl">Ende Phase 1</span><span class="val yellow">Aug. 2026 → <strong>Anfang Okt. 2026</strong></span></div>
+    <div class="analyse-text" style="margin-top:10px;">Der Rahmen bleibt: Marathon 25.04.2027, Ziel 4:30–5:00 h. Verschoben hat sich nur der Weg dorthin — und zwar auf eine Basis, die tatsächlich existiert.</div>
   </div>
 
   <div class="card">
-    <div class="analyse-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-sub);margin-bottom:10px;">📊 KW32 · Ausblick</div>
+    <div class="analyse-label">🎯 Wo das hinführt</div>
+    <div class="analyse-highlight">
+      <strong>Ende KW40 (04.10.):</strong> 17,5 km Long Run, rund 32 km Wochenvolumen. Damit ist die ursprüngliche Phase-1-Marke von 18 km praktisch eingeholt — nur von einer ehrlicheren Basis aus.
+    </div>
     <div class="analyse-highlight green">
-      <strong>KW32 (bisher):</strong> Mi 06.08. 5,22km + Sa 08.08. LR 8,40km 🎉 = 13,62/17,5km · So 09.08. optional locker
+      <strong>Danach:</strong> 29 Wochen bis zum Start, 14,5 km bis zum 32-km-Long-Run. Rund <strong>0,5 km Zuwachs pro Woche</strong> inklusive aller Regenerationswochen. Zeitlich unkritisch — der Zeitplan war nie das Problem, die Sehne ist es.
     </div>
-    <div class="analyse-row"><span class="lbl">Long Run Peak 🏃</span><span class="val" style="color:#4338ca;font-weight:700">8,404km 🎉 (neu 08.08.)</span></div>
-    <div class="analyse-row"><span class="lbl">Gesamt</span><span class="val green">180,451km · 36 Läufe (seit 07.05.)</span></div>
-    <div class="analyse-row"><span class="lbl">VO₂max</span><span class="val accent">51.92 · Rekord 54.14 · Ziel 55</span></div>
-    <div class="analyse-text" style="margin-top:10px;">Nach dem starken KW31 (LR-Peak) war KW32 bewusst/faktisch ruhig — mit exzellenter Erholung. Ab KW33 wieder normaler Aufbau: Mi/Fr Z2 + So Long Run Richtung 9km. Ziel bleibt der Halbmarathon-Testlauf im November.</div>
-  </div>
-
-  <div class="card">
-    <div class="analyse-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-sub);margin-bottom:10px;">🎯 Empfehlung</div>
+    <div class="analyse-highlight" style="background:#fef9c3;border-left:3px solid #ca8a04;">
+      <strong>Phase 2 ab 05.10.2026:</strong> vierter Lauftag pro Woche · erste Tempoarbeit in Zone 3 · Halbmarathon als Testwettkampf im Frühjahr 2027 (Teltowkanal-HM vormerken).
+    </div>
     <div class="analyse-highlight green">
-      <strong>So 09.08.:</strong> wenn Lust & Zeit, ein lockerer Long Run ~8km (neuer Peak möglich) — sonst war KW32 eine gute Erholungswoche
+      <strong>Größter Hebel bleibt der Schlaf:</strong> Ø 6:12 h → Ziel +30 min. Mehr wert als jeder zusätzliche Trainingskilometer.
     </div>
-    <div class="analyse-highlight" style="background:#eef2ff;border-left:3px solid #4338ca;">
-      <strong>Deep Sleep halten:</strong> was auch immer du 05./06.08. anders gemacht hast — beibehalten! Der Tiefschlaf ist der Schlüssel für VO₂max & RHR.
-    </div>
-    <div class="analyse-highlight yellow">
-      <strong>Schlafdauer:</strong> diese Woche mit 5,3–6,6h etwas kurz · wieder Richtung >7h · dann Deep + Dauer = perfekte Erholung
-    </div>
-    <div class="analyse-row"><span class="lbl">Nächster Lauf</span><span class="val green">So 09.08. (optional LR) · sonst KW33</span></div>
-  </div>
-
-</div>
-
-<div id="tab-calendar" class="tab-content">
-  <div id="kal-container"></div>
-  <div class="card"><div class="card-title">Alle Termine</div><div id="termin-list-all" class="termin-list"><div style="color:var(--text-sub);font-size:12px;">Noch keine Termine.</div></div></div>
-</div>
-
-<div id="tab-training" class="tab-content">
-  <div class="card">
-    <div class="card-title">Alle Läufe Phase 1</div>
-    <table class="run-table">
-      <thead><tr><th>Datum</th><th>Typ</th><th>km</th><th>Pace</th></tr></thead>
-      <tbody>
-        <tr><td>06.05.</td><td>Z2</td><td>4.59</td><td>~7:30/km</td></tr>
-        <tr><td>10.05. ✓</td><td>Long Run</td><td>7.02</td><td>~7:30/km</td></tr>
-        <tr><td>13.05. ✓</td><td>Z2</td><td>~4.0</td><td>~6:52/km</td></tr>
-        <tr><td>15.05. ✓</td><td>Z2</td><td>~4.0</td><td>~6:58/km</td></tr>
-        <tr><td>17.05. ✓</td><td>Z2</td><td>~4.0</td><td>~6:40/km 💪</td></tr>
-        <tr><td>19.05. ✓</td><td>Z2</td><td>~4.0</td><td>~6:39/km 💪</td></tr>
-        <tr><td>21.05. ✓</td><td>Z2</td><td>~3.0</td><td>~6:44/km</td></tr>
-        <tr><td><strong>24.05. ✓</strong></td><td>Long Run</td><td><strong>5.45</strong></td><td>7:15/km 🎉</td></tr>
-        <tr><td><strong>26.05. ✓</strong></td><td>Z2</td><td><strong>3.99</strong></td><td>6:59/km ✅ Z2</td></tr>
-        <tr><td><strong>28.05. ✓</strong></td><td>Z2</td><td><strong>3.98</strong></td><td>6:24/km · VO₂max 51,64 🔥</td></tr>
-        <tr><td><strong>31.05. ✓</strong></td><td>Long Run</td><td><strong>5.46</strong></td><td>— · Schlaf ⚠️⚠️</td></tr>
-        <tr><td><strong>03.06. ✓</strong></td><td>Deload Z2</td><td><strong>3.68</strong></td><td>6:28/km · HR 126 ✅ Z2 · VO₂max 52.36 🔥🔥</td></tr>
-        <tr><td><strong>06.06. ✓</strong></td><td>Deload Z2</td><td><strong>3.36</strong></td><td>6:22/km · HR 127 ✅ Z2 · VO₂max 52.99 🔥 · Schlaf ~7h ✅</td></tr>
-        <tr><td><strong>09.06. ✓</strong></td><td>Long Run</td><td><strong>4.31</strong></td><td>6:45/km · HR 133 ob.Z2 · VO₂max 53.11 🔥 · Schlaf 6.8h ✅</td></tr>
-        <tr><td><strong>12.06. ✓</strong></td><td>Z2</td><td><strong>4.66</strong></td><td>6:35/km · HR 128 ✅ Z2 · VO₂max 53.35 🔥 · Schlaf 7.0h ✅ · HRV 29.5ms ⚠️</td></tr>
-        <tr><td><strong>14.06. ✓</strong></td><td>Long Run</td><td><strong>5.66</strong></td><td>6:25/km · HR ~127 ✅ Z2 · VO₂max 53.17 · HRV 43.8ms ✅ · RHR 48 ✅ TOP!</td></tr>
-        <tr><td><strong>16.06. ✓</strong></td><td>Z2</td><td><strong>3.87</strong></td><td>6:26/km · HR 128 ✅ Z2 · VO₂max 53.08 · HRV 33.2ms ⚠️ · Power 191W</td></tr>
-        <tr><td><strong>19.06. ✓</strong></td><td>Z2</td><td><strong>4.715</strong></td><td>6:31/km · HR 128 ✅ Z2 · VO₂max 53.66 🔥🔥 REKORD! · GCT 281ms · Power 188.7W</td></tr>
-        <tr><td><strong>21.06. ✓</strong></td><td>Long Run</td><td><strong>7.058</strong></td><td>6:55/km · HR 134 ✅ Z2 · VO₂max 53.61 · GCT 302ms · Power 178.1W · HRV 67.5ms 🔥🔥</td></tr>
-        <tr><td><strong>23.06. ✓</strong></td><td>Z2</td><td><strong>4.647</strong></td><td>6:27/km · HR 126 ✅ Z2 · VO₂max 53.87 🔥 REKORD! · GCT 281ms · Power 195.8W · 05:38 Uhr</td></tr>
-        <tr><td><strong>25.06. ✓</strong></td><td>Z2</td><td><strong>4.573</strong></td><td>6:41/km · HR 137 ✅ Z2 · VO₂max 53.9 🔥 NEUER REKORD! · GCT 291ms · Power 181.2W · 08:28 Uhr 🌡️</td></tr>
-        <tr><td><strong>01.07. ✓</strong></td><td>Z2</td><td><strong>4.384</strong></td><td>6:32/km · HR 129 ✅ Z2 · VO₂max 53.76 · GCT 288ms · Power 186.4W · 18:27 Uhr 🌙 Abendlauf!</td></tr>
-        <tr><td><strong>05.07. ✓</strong></td><td>Z2</td><td><strong>5.065</strong></td><td>6:45/km · HR 129 ✅ Z2 · VO₂max 53.11 · Stride 0.903m · 13:28 Uhr 🌞 Mittagslauf · 🎉 401km!</td></tr>
-        <tr><td><strong>07.07. ✓</strong></td><td>Z2</td><td><strong>5.029</strong></td><td>~6:26/km · VO₂max 53.49 · 09:48 Uhr</td></tr>
-        <tr><td><strong>10.07. ✓</strong></td><td>Z2</td><td><strong>4.536</strong></td><td>~6:49/km · VO₂max 54.04 🔥 REKORD (damals)</td></tr>
-        <tr><td><strong>12.07. ✓</strong></td><td>Long Run</td><td><strong>5.688</strong></td><td>~7:01/km · VO₂max 53.75 · Schlaf 8.82h 🔥 · 🎉 KW28 abgeschl. 15.253km</td></tr>
-        <tr><td><strong>14.07. ✓</strong></td><td>Z2</td><td><strong>3.765</strong></td><td>6:26/km · HR 131 ✅ Z2 · maxHR 141 · VO₂max 54.14 🔥 REKORD! · Power 194W · GCT 287ms · Stride 0.975m · 06:44 Uhr</td></tr>
-        <tr><td><strong>16.07. ✓</strong></td><td>Z2 lang</td><td><strong>6.887</strong></td><td>~6:55/km · avgHR 134 ✅ ob. Z2 · maxHR 146 · 47:36 min · VO₂max 53.9 · 07:51 Uhr · fast LR-Länge 🏃</td></tr>
-        <tr><td><strong>18.07. ✓</strong></td><td>Z2</td><td><strong>6.015</strong></td><td>~6:45/km · avgHR 131 ✅ Z2 · maxHR 142 · 41:24 min · VO₂max 53.61 · 10:41 Uhr</td></tr>
-        <tr><td><strong>24.07. ✓</strong></td><td>Z2 (Deload)</td><td><strong>4.492</strong></td><td>6:38/km · avgHR 130 ✅ Z2 · maxHR 138 · 29:48 min · VO₂max 53.18 · 16:38 Uhr</td></tr>
-        <tr><td><strong>26.07. ✓</strong></td><td>Z2 (Deload)</td><td><strong>5.505</strong></td><td>6:59/km · avgHR 130 ✅ Z2 · maxHR 155 (kurz) · 38:24 min · VO₂max 53.28 · 10:34 Uhr</td></tr>
-        <tr><td><strong>28.07. ✓</strong></td><td>Z2</td><td><strong>6.177</strong></td><td>7:16/km · avgHR 136 ✅ ob. Z2 · maxHR 150 · 44:54 min · VO₂max 53.13 · 12:25 Uhr · KW31-Start</td></tr>
-        <tr><td><strong>31.07. ✓</strong></td><td>Z2</td><td><strong>4.082</strong></td><td>7:07/km · avgHR 137 ✅ ob. Z2 · maxHR 146 · 29:06 min · VO₂max 52.67 · 17:55 Uhr</td></tr>
-        <tr><td><strong>02.08. ✓</strong></td><td>Long Run 🎉</td><td><strong>7.752</strong></td><td>6:59/km · avgHR 130 ✅ Z2 · maxHR 158 (kurz) · 54:12 min · VO₂max 52.76 · 10:53 Uhr · NEUER PEAK (alt 7.058)</td></tr>
-        <tr><td><strong>06.08. ✓</strong></td><td>Z2</td><td><strong>5.219</strong></td><td>7:07/km · avgHR 129 ✅ Z2 · maxHR 142 · 37:12 min · VO₂max 52.63 · 08:06 Uhr</td></tr>
-        <tr style="background:#e0e7ff"><td><strong>08.08. ✓</strong></td><td>Long Run 🎉</td><td><strong>8.404</strong></td><td>7:13/km · avgHR 132 ✅ Z2 · maxHR nur 141 (komplett Z2!) · 60:36 min · VO₂max 51.92 · 08:41 Uhr · NEUER PEAK (alt 7.752)</td></tr>
-      </tbody>
-    </table>
-    <div style="font-size:11px;color:var(--text-sub);margin-top:8px;">KW32: 13,623km · KW31 ✅: 18,011km · Gesamt: 180,451km · 36 Läufe (seit 07.05.) · LR Peak: 8.404km 🎉 (neu!) · VO₂max REKORD 54.14 🔥</div>
-  </div>
-  <div class="card"><div class="card-title">VO₂max Entwicklung</div><div class="chart-wrap" style="height:160px"><canvas id="vo2Chart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;text-align:center;">Aktuell: <strong style="color:var(--accent)">51.92 ml/kg/min</strong> (Sa 08.08.) · Rekord: <strong style="color:var(--green)">54.14 🔥 (Di 14.07.)</strong> · Trend: 52.76 → 52.63 → 51.92 (nach LR) · Ziel: 55+</div></div>
-  <div class="card"><div class="card-title">HR-Zonen (Alle Läufe)</div><div class="chart-wrap" style="height:180px"><canvas id="zoneChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">Z2 Zielzone: 120–138 bpm · Pace 7:00–8:00/km</div></div>
-</div>
-
-<div id="tab-sleep" class="tab-content">
-  <div class="card"><div class="card-title">Schlaf letzte Nächte (h)</div><div class="chart-wrap" style="height:160px"><canvas id="sleepChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">03.–07.08.: 6.26 → 5.33 → 5.8 → 6.62h — Dauer eher kurz, ABER 🎉 Deep Sleep durchgebrochen: 05.08. 1,77h · 06.08. 1,52h ✅ (die höchsten seit Langem!) · Ziel jetzt: Dauer wieder hoch · 🟢 ≥7h &nbsp;🔵 6–7h &nbsp;🟡 5–6h &nbsp;🔴 &lt;5h</div></div>
-  <div class="card"><div class="card-title">HRV (ms) Verlauf</div><div class="chart-wrap" style="height:160px"><canvas id="hrvChart"></canvas></div><div style="font-size:11px;color:var(--text-sub);margin-top:8px;">HRV 03.–07.08.: <strong style="color:var(--green)">47.6 / 44.9 / 45.2 / 45.7 / 41.4ms ✅</strong> — durchgehend stark! · 02.08.-Dip auf 41.5 revidiert (kein echter Dip) · Schwelle: 30ms · Erholung top</div></div>
-  <div class="card"><div class="card-title">Körper-Metriken</div><div class="metric-grid three"><div class="metric-box"><div class="metric-val green">41.4</div><div class="metric-unit">ms</div><div class="metric-label">HRV 07.08. ✅</div></div><div class="metric-box"><div class="metric-val green">52</div><div class="metric-unit">bpm</div><div class="metric-label">RHR 07.08. ✅</div></div><div class="metric-box"><div class="metric-val accent">54.14</div><div class="metric-unit">ml/kg/min</div><div class="metric-label">VO₂max · 🔥 Rekord</div></div></div></div>
-</div>
-
-<div id="tab-watchdog" class="tab-content">
-  <div class="card">
-    <div class="card-title">Watchdog Status</div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span class="badge green" style="font-size:14px;padding:4px 14px;">✅ GRÜN</span><span style="font-size:12px;color:var(--text-sub)">8. August 2026 — KW32 · 🎉 neuer LR-Peak 8,40km (komplett Z2!) · HRV stark · Deep-Sleep-Durchbruch · alles top</span></div>
-    <div class="wd-item"><div class="wd-dot" style="background:#4338ca"></div><div><div class="wd-text">🎉 Neuer LR-Peak — sauberster LR bisher</div><div class="wd-sub">Sa 08.08. 8,404km @7:13 · avgHR 132 · maxHR nur 141 → komplett Zone 2 über 60 min · alter Peak 7,752km übertroffen</div></div></div>
-    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">HRV ✅ durchgehend stark</div><div class="wd-sub">04.–08.08.: 44.9 / 45.2 / 45.7 / 41.4 / 52.7ms ✅ · 08.08. hoch (evtl. noch Revision) · Erholung top</div></div></div>
-    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">🎉 Deep Sleep durchgebrochen</div><div class="wd-sub">05.08. 1,77h · 06.08. 1,52h ✅ — die höchsten Werte seit Langem! Der lange offene Punkt löst sich</div></div></div>
-    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">RHR ✅ top</div><div class="wd-sub">03.–07.08. durchgehend 52–55 bpm · alles im Normalbereich</div></div></div>
-    <div class="wd-item"><div class="wd-dot green"></div><div><div class="wd-text">Keine 3 Lauftage in Folge</div><div class="wd-sub">KW32: 2 Läufe (Mi 06.08. + Sa 08.08.) mit Pause dazwischen · unkritisch</div></div></div>
-    <div class="wd-item"><div class="wd-dot yellow"></div><div><div class="wd-text">Schlaf-Dauer diese Woche kurz</div><div class="wd-sub">05.–07.08. nur 5.3–6.6h (Deep dafür top) · Ziel: Dauer wieder auf >7h bringen, dann passt beides</div></div></div>
-  </div>
-  <div class="card">
-    <div class="card-title">Trainer-Empfehlung</div>
-    <div style="font-size:13px;line-height:1.8;"><strong>Top-Erholungswoche.</strong> HRV die ganze Woche stark (41–48ms), RHR bei 52 — und der <strong>🎉 Deep Sleep ist endlich durchgebrochen</strong> (05.08. 1,77h, 06.08. 1,52h). Genau der Punkt, an dem wir wochenlang dran waren.<br><strong>✅ HRV-Effekt bestätigt (wieder):</strong> der 02.08.-„Dip" (30,8) wurde auf 41,5ms revidiert — war also gar keiner.<br><strong>Trainingsseitig</strong> das Highlight: Sa 08.08. <strong>neuer Long-Run-Peak 8,404km — komplett in Zone 2</strong> (maxHR nur 141). Genau so bauen wir die aerobe Basis auf.<br><strong>Plan:</strong> So 09.08. höchstens locker (der LR steht schon); KW33 dann normal weiter Richtung ~9km LR. Und: Schlaf<strong>dauer</strong> wieder über 7h bringen (die kurze Woche war der einzige Wermutstropfen).<br>180,451km gesamt · 36 Läufe · VO₂max Rekord 54.14 · LR-Peak 8,404km 🎉</div>
   </div>
 </div>
 
+<!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModalOnBg(event)">
   <div class="modal">
     <div class="modal-title" id="modal-date-title">Termin hinzufügen</div>
@@ -334,205 +503,360 @@
 </nav>
 
 <script>
-const TODAY = new Date('2026-08-08T00:00:00');
-const MARATHON = new Date('2027-04-25T09:00:00');
-const DAY_NAMES = ['So','Mo','Di','Mi','Do','Fr','Sa'];
-const DAY_NAMES_FULL = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+(function(){
+  "use strict";
+  var MARATHON = new Date('2027-04-25T09:00:00');
+  var TODAY = new Date('2026-08-08T00:00:00');
+  var DAY_NAMES = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  var DAY_NAMES_FULL = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
 
-const TRAINING_PLAN = {
-  '2026-05-06': { type:'training-done', label:'Z2 4.6km ✓' },
-  '2026-05-10': { type:'training-done', label:'LR 7.0km ✓' },
-  '2026-05-13': { type:'training-done', label:'Z2 4.0km ✓' },
-  '2026-05-15': { type:'training-done', label:'Z2 4.0km ✓' },
-  '2026-05-17': { type:'training-done', label:'Z2 4.0km ✓' },
-  '2026-05-18': { type:'training-done', label:'Ruhetag ✓' },
-  '2026-05-19': { type:'training-done', label:'Z2 4.0km ✓' },
-  '2026-05-21': { type:'training-done', label:'Z2 3.0km ✓' },
-  '2026-05-24': { type:'training-done', label:'LR 5.45km ✓' },
-  '2026-05-26': { type:'training-done', label:'Ruhetag ✓' },
-  '2026-05-26': { type:'training-done', label:'Z2 3.99km ✓' },
-  '2026-05-28': { type:'training-done', label:'Z2 3.98km ✓' },
-  '2026-05-31': { type:'training-done', label:'LR 5.46km ✓' },
-  '2026-06-03': { type:'training-done', label:'Z2 3.68km ✓' },
-  '2026-06-06': { type:'training-done', label:'Z2 3.36km ✓' },
-  '2026-06-07': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-06-08': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-06-09': { type:'training-done', label:'LR 4.31km ✓' },
-  '2026-06-10': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-06-11': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-06-12': { type:'training-done', label:'Z2 4.66km ✓' },
-  // KW24 — Wiederaufbau nach Deload (~11km Ziel)
-  '2026-06-13': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-06-14': { type:'training-done', label:'LR 5.66km ✓' },
-  '2026-06-15': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-06-16': { type:'training-done', label:'Z2 3.87km ✓' },
-  // KW25 — Aufbau (Limit ~15.6km)
-  '2026-06-17': { type:'training-rest', label:'Rad ✓' },
-  '2026-06-18': { type:'training-rest', label:'Rad ✓' },
-  '2026-06-19': { type:'training-done', label:'Z2 4.72km ✓ 🔥' },
-  '2026-06-20': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-06-21': { type:'training-done', label:'LR 7.06km ✓ 🏃' },
-  '2026-06-22': { type:'training-rest', label:'Ruhetag' },
-  // KW26 — Aufbau (~15km Ziel)
-  '2026-06-23': { type:'training-done', label:'Z2 4.647km ✓' },
-  '2026-06-24': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-06-25': { type:'training-done', label:'Z2 4.573km ✓' },
-  '2026-06-26': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-06-27': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-06-28': { type:'training-rest', label:'LR abgesagt 🌡️' },
-  '2026-06-29': { type:'training-rest', label:'Ruhetag ✓' },
-  // KW27 — Limit 9.68km
-  '2026-07-01': { type:'training-done', label:'Z2 4.384km ✓' },
-  '2026-07-03': { type:'training-rest', label:'Rad ✓' },
-  '2026-07-04': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-07-05': { type:'training-done', label:'Z2 5.065km ✓ 🎉' },
-  // KW28 — abgeschlossen 15.253km 🎯
-  '2026-07-06': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-07-07': { type:'training-done', label:'Z2 5.029km ✓' },
-  '2026-07-08': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-07-09': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-07-10': { type:'training-done', label:'Z2 4.536km ✓ 🔥' },
-  '2026-07-11': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-07-12': { type:'training-done', label:'LR 5.688km ✓ 🎉' },
-  // KW29 — Limit 16.5km (läuft)
-  '2026-07-13': { type:'training-rest', label:'Ruhetag ✓' },
-  '2026-07-14': { type:'training-done', label:'Z2 3.765km ✅ 🔥' },
-  '2026-07-16': { type:'training-done', label:'Z2 6.887km ✅ 🏃' },
-  '2026-07-18': { type:'training-done', label:'Z2 6.015km ✅' },
-  '2026-07-19': { type:'training-rest', label:'Ruhetag' },
-  // KW30 — Deload ~9km
-  '2026-07-24': { type:'training-done', label:'Z2 4.492km ✅' },
-  '2026-07-26': { type:'training-done', label:'Z2 5.505km ✅' },
-  // KW31 — Aufbau (Phase 2)
-  '2026-07-28': { type:'training-done', label:'Z2 6.177km ✅' },
-  '2026-07-31': { type:'training-done', label:'Z2 4.082km ✅' },
-  '2026-08-02': { type:'training-long', label:'LR 7.752km ✅ 🎉' },
-  // KW32
-  '2026-08-06': { type:'training-done', label:'Z2 5.219km ✅' },
-  '2026-08-08': { type:'training-long', label:'LR 8.404km ✅ 🎉' },
-};
+  /* ============================================================
+     8-WOCHEN-PLAN · Phase 1 · Basis: LR 8,404 km (Sa 08.08.2026)
+     Long Run +1,5 km je Aufbauwoche · Volumen max. +10 %/Woche
+     Jede 4. Woche Regeneration (-30 bis -35 %)
+     ============================================================ */
+  var PLAN8 = [
+    { kw:33, dates:'10.–16.08.', tag:'Aufbau', regen:false, vol:'20–24 km', lr:10,
+      days:[
+        {d:'Mo',date:'10.08.',t:'Kurzer Lauf',n:'Z2 · 120–138 bpm',km:'4–6 km',z:'~28–42 min',c:'c-kurz'},
+        {d:'Mi',date:'12.08.',t:'Kräftigung',n:'Split Squats · Wadenheben · Glute Bridges',km:'20 min',z:'Pflicht',c:'c-kraft'},
+        {d:'Do',date:'13.08.',t:'Mittlerer Lauf',n:'Z2 · 120–138 bpm',km:'6–8 km',z:'~41–56 min',c:'c-mittel'},
+        {d:'Sa',date:'15.08.',t:'Long Run 🎯',n:'Erstmals zweistellig · konstant, kein Endspurt',km:'10 km',z:'~72 min',c:'c-lr'}
+      ]},
+    { kw:34, dates:'17.–23.08.', tag:'Aufbau', regen:false, vol:'21,5–25,5 km', lr:11.5,
+      days:[
+        {d:'Mo',date:'17.08.',t:'Kurzer Lauf',n:'Z2',km:'4–6 km',z:'~28–42 min',c:'c-kurz'},
+        {d:'Mi',date:'19.08.',t:'Kräftigung',n:'2 Sätze mehr als letzte Woche',km:'20 min',z:'Pflicht',c:'c-kraft'},
+        {d:'Do',date:'20.08.',t:'Mittlerer Lauf',n:'Z2',km:'6–8 km',z:'~41–56 min',c:'c-mittel'},
+        {d:'Sa',date:'22.08.',t:'Long Run 💧',n:'Erstmals über 80 Min — Wasser mitnehmen',km:'11,5 km',z:'~82 min',c:'c-lr'}
+      ]},
+    { kw:35, dates:'24.–30.08.', tag:'Aufbau', regen:false, vol:'23–27 km', lr:13,
+      days:[
+        {d:'Mo',date:'24.08.',t:'Kurzer Lauf',n:'Z2',km:'4–6 km',z:'~28–42 min',c:'c-kurz'},
+        {d:'Mi',date:'26.08.',t:'Kräftigung',n:'Einbeinig betonen',km:'25 min',z:'Pflicht',c:'c-kraft'},
+        {d:'Do',date:'27.08.',t:'Mittlerer Lauf',n:'Z2',km:'6–8 km',z:'~41–56 min',c:'c-mittel'},
+        {d:'Sa',date:'29.08.',t:'Long Run ⚡',n:'Über 90 Min → Elektrolytgetränk startet hier',km:'13 km',z:'~93 min',c:'c-lr'}
+      ]},
+    { kw:36, dates:'31.08.–06.09.', tag:'Regeneration −30 %', regen:true, vol:'17,5 km', lr:8.5,
+      days:[
+        {d:'Mo',date:'31.08.',t:'Kurzer Lauf',n:'Bewusst am unteren Ende bleiben',km:'4 km',z:'~28 min',c:'c-kurz'},
+        {d:'Mi',date:'02.09.',t:'Kräftigung',n:'Normal weiter — die pausiert nicht',km:'20 min',z:'Pflicht',c:'c-kraft'},
+        {d:'Do',date:'03.09.',t:'Mittlerer Lauf',n:'Z2, locker',km:'5 km',z:'~34 min',c:'c-mittel'},
+        {d:'Sa',date:'05.09.',t:'Long Run kurz',n:'Hier wird die Anpassung eingebaut',km:'8,5 km',z:'~61 min',c:'c-lr'}
+      ]},
+    { kw:37, dates:'07.–13.09.', tag:'Aufbau', regen:false, vol:'25,5–29,5 km', lr:14.5,
+      days:[
+        {d:'Mo',date:'07.09.',t:'Kurzer Lauf',n:'Z2',km:'4–6 km',z:'~28–42 min',c:'c-kurz'},
+        {d:'Mi',date:'09.09.',t:'Kräftigung',n:'Gewicht oder Wiederholungen erhöhen',km:'25 min',z:'Pflicht',c:'c-kraft'},
+        {d:'Do',date:'10.09.',t:'Mittlerer Lauf',n:'Z2',km:'7–9 km',z:'~48–63 min',c:'c-mittel'},
+        {d:'Sa',date:'12.09.',t:'Long Run',n:'Getränk nach 45 Min, nicht erst bei Durst',km:'14,5 km',z:'~104 min',c:'c-lr'}
+      ]},
+    { kw:38, dates:'14.–20.09.', tag:'Aufbau', regen:false, vol:'28–31 km', lr:16,
+      days:[
+        {d:'Mo',date:'14.09.',t:'Kurzer Lauf',n:'Z2',km:'5–6 km',z:'~35–42 min',c:'c-kurz'},
+        {d:'Mi',date:'16.09.',t:'Kräftigung',n:'Split Squats jetzt mit Zusatzgewicht',km:'25 min',z:'Pflicht',c:'c-kraft'},
+        {d:'Do',date:'17.09.',t:'Mittlerer Lauf',n:'Z2',km:'7–9 km',z:'~48–63 min',c:'c-mittel'},
+        {d:'Sa',date:'19.09.',t:'Long Run',n:'Verpflegung wie am Wettkampftag durchspielen',km:'16 km',z:'~114 min',c:'c-lr'}
+      ]},
+    { kw:39, dates:'21.–27.09.', tag:'Aufbau · Peak', regen:false, vol:'30,5–33,5 km', lr:17.5,
+      days:[
+        {d:'Mo',date:'21.09.',t:'Kurzer Lauf',n:'Z2',km:'5–6 km',z:'~35–42 min',c:'c-kurz'},
+        {d:'Mi',date:'23.09.',t:'Kräftigung',n:'Vor der Peak-Einheit nicht auslassen',km:'25 min',z:'Pflicht',c:'c-kraft'},
+        {d:'Do',date:'24.09.',t:'Mittlerer Lauf',n:'Z2',km:'8–10 km',z:'~55–70 min',c:'c-mittel'},
+        {d:'Sa',date:'26.09.',t:'Long Run · längster seit HM 2024 🏅',n:'Frühstück wie im Essensplan, Getränk dabei',km:'17,5 km',z:'~125 min',c:'c-lr'}
+      ]},
+    { kw:40, dates:'28.09.–04.10.', tag:'Regeneration −35 %', regen:true, vol:'21,5 km', lr:11.5,
+      days:[
+        {d:'Mo',date:'28.09.',t:'Kurzer Lauf',n:'Locker, kurz',km:'4 km',z:'~28 min',c:'c-kurz'},
+        {d:'Mi',date:'30.09.',t:'Kräftigung',n:'Läuft durch',km:'20 min',z:'Pflicht',c:'c-kraft'},
+        {d:'Do',date:'01.10.',t:'Mittlerer Lauf',n:'Z2, locker',km:'6 km',z:'~41 min',c:'c-mittel'},
+        {d:'Sa',date:'03.10.',t:'Long Run kurz',n:'Danach beginnt Phase 2',km:'11,5 km',z:'~82 min',c:'c-lr'}
+      ]}
+  ];
 
-let TERMINE = [];
-document.getElementById('days').textContent = Math.ceil((MARATHON - new Date()) / 86400000);
+  var TRAINING_PLAN = {
+    /* --- gelaufen --- */
+    '2026-06-21': { type:'training-done', label:'LR 7.06km ✓ 🏃' },
+    '2026-06-23': { type:'training-done', label:'Z2 4.647km ✓ 🔥' },
+    '2026-06-25': { type:'training-done', label:'Z2 4.573km ✓ 🔥' },
+    '2026-06-28': { type:'training-rest', label:'41°C 🌡️ kein LR' },
+    '2026-07-01': { type:'training-done', label:'Z2 4.384km ✓ 🌙' },
+    '2026-07-05': { type:'training-done', label:'LR 5.065km ✓' },
+    '2026-07-07': { type:'training-done', label:'Z2 5,03km ✓' },
+    '2026-07-10': { type:'training-done', label:'Z2 4,54km ✓ 🌙' },
+    '2026-07-12': { type:'training-done', label:'LR 5,69km ✓ 🏃' },
+    '2026-07-14': { type:'training-done', label:'Z2 3,765km ✓ 🔥' },
+    '2026-07-16': { type:'training-done', label:'Z2 6,887km ✓ 🏃' },
+    '2026-07-18': { type:'training-done', label:'Z2 6,015km ✓' },
+    '2026-07-19': { type:'training-rest', label:'Ruhetag ✓' },
+    '2026-07-24': { type:'training-done', label:'Z2 4,49km ✓' },
+    '2026-07-26': { type:'training-done', label:'Z2 5,51km ✓' },
+    '2026-07-28': { type:'training-done', label:'Z2 6,18km ✓' },
+    '2026-07-31': { type:'training-done', label:'Z2 4,08km ✓' },
+    '2026-08-02': { type:'training-done', label:'LR 7,752km ✓ 🎉' },
+    '2026-08-06': { type:'training-done', label:'Z2 5,22km ✓' },
+    '2026-08-08': { type:'training-long', label:'LR 8,404km ✓ 🎉' },
+    '2026-08-09': { type:'training-rest', label:'Ruhetag / locker' }
+  };
 
-let _trainR = false, _sleepR = false;
-function showTab(id, el) {
-  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('on'));
-  document.getElementById('tab-' + id).style.display = 'block';
-  if (el) el.classList.add('on');
-  if (id === 'training' && !_trainR) { _trainR = true; renderTraining(); }
-  if (id === 'sleep' && !_sleepR)    { _sleepR = true; renderSleep(); }
-  if (id === 'calendar')             { renderKalender(); }
-}
-document.getElementById('tab-overview').style.display = 'block';
-
-const gc = 'rgba(0,0,0,0.06)', tc = '#6b7280';
-const baseOpts = () => ({ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}}, y:{ticks:{color:tc,font:{size:10}},grid:{color:gc}} } });
-
-new Chart(document.getElementById('volChart').getContext('2d'), {
-  type:'bar', data:{ labels:['KW21','KW22','KW23','KW24','KW25','KW26','KW27','KW28','KW29','KW30','KW31'], datasets:[{ data:[12.45,13.43,7.04,14.63,15.638,9.22,9.449,15.253,16.667,9.997,18.011], backgroundColor:['#16a34a','#ca8a04','#16a34a','#16a34a','#f59e0b','#f59e0b','#16a34a','#16a34a','#16a34a','#ca8a04','#16a34a'], borderRadius:6 }] },
-  options:{ ...baseOpts(), scales:{ x:{ticks:{color:tc,font:{size:11}},grid:{display:false}}, y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},suggestedMax:17} }}
-});
-
-function renderTraining() {
-  new Chart(document.getElementById('vo2Chart').getContext('2d'), {
-    type:'line', data:{ labels:['06.05.','10.05.','13.05.','15.05.','17.05.','19.05.','21.05.','24.05.','28.05.','03.06.','06.06.','09.06.','12.06.','14.06.','16.06.','19.06.','21.06.','23.06.','25.06.','01.07.','05.07.','07.07.','10.07.','12.07.','14.07.','16.07.','18.07.','24.07.','26.07.','28.07.','31.07.','02.08.','06.08.','08.08.'], datasets:[{ data:[48.5,49.5,50.15,50.11,50.73,52.48,51.59,51.53,51.64,52.36,52.99,53.11,53.35,53.17,53.08,53.66,53.61,53.87,53.9,53.76,53.11,53.49,54.04,53.75,54.14,53.9,53.61,53.18,53.28,53.13,52.67,52.76,52.63,51.92], borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', pointBackgroundColor:['#2563eb','#2563eb','#2563eb','#2563eb','#2563eb','#16a34a','#2563eb','#4338ca','#16a34a','#16a34a','#16a34a','#16a34a','#16a34a','#16a34a','#2563eb','#dc2626','#16a34a','#16a34a','#dc2626','#2563eb','#2563eb','#2563eb','#16a34a','#2563eb','#16a34a','#2563eb','#2563eb','#2563eb','#2563eb','#2563eb','#2563eb','#4338ca','#2563eb','#4338ca'], pointRadius:[5,5,5,5,5,7,5,7,7,7,7,7,8,7,7,10,8,7,10,7,7,7,8,7,10,7,7,7,7,7,7,8,7,8], tension:0.3, fill:true }] },
-    options:{ ...baseOpts(), scales:{ x:{ticks:{color:tc,font:{size:9}},grid:{display:false}}, y:{min:47,max:56,ticks:{color:tc,font:{size:10}},grid:{color:gc}} }}
-  });
-  new Chart(document.getElementById('zoneChart').getContext('2d'), {
-    type:'doughnut', data:{ labels:['Z2 (120-138)','Z1 (<120)','Z3 (139-155)','Z4/5 (>155)'], datasets:[{ data:[68,12,15,5], backgroundColor:['#2563eb','#93c5fd','#f59e0b','#dc2626'], borderWidth:2, borderColor:'#fff' }] },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,position:'right',labels:{color:tc,font:{size:10},padding:8,boxWidth:10}} } }
-  });
-}
-
-function renderSleep() {
-  // Schlaf: +14.07(5.79), +15.07(6.12), +16.07(6.02), +17.07(6.25) — 51 Einträge (13.07 ohne Schlaf-Eintrag)
-  const sleepData = [5.9,5.3,6.0,5.8,6.5,6.3,6.25,6.25,5.60,4.53,7.34,6.66,5.39,7.18,6.75,5.70,6.32,6.47,5.88,8.26,6.76,8.19,6.76,6.38,7.14,6.21,6.23,6.61,5.54,5.91,5.19,5.40,6.11,6.91,6.32,4.37,5.91,6.29,5.62,5.24,5.41,4.21,3.27,7.11,6.18,5.41,8.82,5.79,6.12,6.02,6.25,6.96,5.73,7.41,7.72,5.31,5.29,7.66,7.72,6.16,7.68,6.14,7.61,7.84,6.98,7.35,6.26,5.33,5.8,6.62];
-  const lbls = ['04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','24'].map(d => d+'.05').concat(['25.05','26.05','27.05','28.05','29.05','15.06','16.06','17.06','18.06','21.06','23.06','25.06','27.06','28.06','29.06','30.06','01.07','02.07','03.07','05.07','06.07','07.07','08.07','09.07','10.07','11.07','12.07','14.07','15.07','16.07','17.07','19.07','20.07','21.07','22.07','23.07','24.07','25.07','26.07','27.07','28.07','29.07','30.07','31.07','01.08','02.08','03.08','05.08','06.08','07.08']);
-  new Chart(document.getElementById('sleepChart').getContext('2d'), {
-    type:'bar', data:{ labels:lbls, datasets:[{ data:sleepData, backgroundColor:sleepData.map(v=>v>=7?'#16a34a':v>=6?'#2563eb':v>=5?'#f59e0b':'#dc2626'), borderRadius:5 }] },
-    options:{ ...baseOpts(), scales:{ x:{ticks:{color:tc,font:{size:9}},grid:{display:false}}, y:{min:0,max:9,ticks:{color:tc,font:{size:10}},grid:{color:gc}} }}
-  });
-  // HRV: MUSS gleich lang sein wie sleepData (51 Werte) — +14.07(45.6), +15.07(28.3 Dip), +16.07(42.0), +17.07(38.2)
-  // Achtung: hrv nutzt GLEICHE lbls wie sleepData! Tage ohne Schlaf-Eintrag (z.B. 13.07.) → kein hrv-Eintrag!
-  const hrv = [40,38,43,46,42,37,46,38,37,37,43,65,45,41,45,40,33,38,38,37,44,43,40,37,34,38,33,34,34,39,46,58,45,38,46,41,37,35,41,40,39,44.9,30.5,38.8,44.8,42.0,39.0,45.6,28.3,42.0,38.2,36.0,36.1,37.8,38.4,34.5,30.3,44.4,34.7,52.7,71.4,42.2,36.9,38.7,34.6,41.5,47.6,45.2,45.7,41.4];
-  new Chart(document.getElementById('hrvChart').getContext('2d'), {
-    type:'line', data:{ labels:lbls, datasets:[
-      { data:hrv, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.08)', pointBackgroundColor:hrv.map(v=>v<30?'#dc2626':v<40?'#f59e0b':v>=50?'#16a34a':'#2563eb'), pointRadius:hrv.map((v,i)=>i===hrv.length-1?7:5), tension:0.3, fill:true },
-      { data:new Array(hrv.length).fill(30), borderColor:'#dc2626', borderDash:[4,4], borderWidth:1.5, pointRadius:0 }
-    ]},
-    options:{ ...baseOpts(), plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:tc,font:{size:9}},grid:{display:false}}, y:{min:0,ticks:{color:tc,font:{size:10}},grid:{color:gc}} }}
-  });
-}
-
-function getMonday(d) { const date=new Date(d); const day=date.getDay(); date.setDate(date.getDate()+(day===0?-6:1-day)); date.setHours(0,0,0,0); return date; }
-function dateStr(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-function addDays(d,n) { const r=new Date(d); r.setDate(r.getDate()+n); return r; }
-function fmtDay(d) { return d.getDate()+'.'+(d.getMonth()+1)+'.'; }
-function termineForDay(ds) { return TERMINE.filter(t=>t.datum===ds); }
-function trainingForDay(ds) { return TRAINING_PLAN[ds]||null; }
-let _currentEditDate=null;
-
-function renderKalender() {
-  const container=document.getElementById('kal-container'); container.innerHTML='';
-  const monday=getMonday(TODAY);
-  for(let w=0;w<3;w++){
-    const weekStart=addDays(monday,w*7); const weekEnd=addDays(weekStart,6); const kw=getKW(weekStart);
-    const weekDiv=document.createElement('div'); weekDiv.className='kal-week';
-    const hdr=document.createElement('div'); hdr.className='kal-week-hdr';
-    hdr.innerHTML=`<span>${fmtDay(weekStart)} – ${fmtDay(weekEnd)}</span><span class="kw-badge">KW ${kw}</span>`;
-    weekDiv.appendChild(hdr);
-    const card=document.createElement('div'); card.className='card'; card.style.padding='10px'; card.style.marginBottom='0';
-    const grid=document.createElement('div'); grid.className='kal-grid';
-    for(let d=0;d<7;d++){
-      const day=addDays(weekStart,d); const ds=dateStr(day);
-      const isToday=ds===dateStr(TODAY); const isPast=day<TODAY&&!isToday;
-      const training=trainingForDay(ds); const termine=termineForDay(ds);
-      const dayDiv=document.createElement('div');
-      dayDiv.className='kal-day'+(isToday?' today':'')+(isPast?' past':'')+(!training&&!isToday?' rest':'');
-      dayDiv.innerHTML=`<div class="kal-day-name">${DAY_NAMES[day.getDay()]}</div><div class="kal-day-num">${day.getDate()}</div>${training?`<span class="kal-chip ${training.type}">${training.label}</span>`:''}${termine.map(t=>`<span class="kal-chip termin-${t.typ}">${t.zeit?t.zeit+' ':''}${t.titel}</span>`).join('')}<button class="kal-add-btn" onclick="openModal('${ds}',event)">+</button>`;
-      dayDiv.addEventListener('click',e=>{if(e.target.classList.contains('kal-add-btn'))return;openModal(ds);});
-      grid.appendChild(dayDiv);
+  /* Plan KW33–KW40 automatisch aus PLAN8 in den Tageskalender übernehmen */
+  (function fillPlan(){
+    function iso(dm, year){ var p = dm.replace(/\.$/,'').split('.'); return year+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0'); }
+    for (var i=0;i<PLAN8.length;i++){
+      var w = PLAN8[i];
+      for (var j=0;j<w.days.length;j++){
+        var d = w.days[j];
+        var key = iso(d.date, 2026);
+        var typ = d.c==='c-lr' ? (w.regen ? 'training-deload' : 'training-long')
+                : d.c==='c-kraft' ? 'training-kraft'
+                : w.regen ? 'training-deload' : 'training-plan';
+        var lbl = d.c==='c-kraft' ? '💪 Kraft '+d.km
+                : d.c==='c-lr' ? 'LR '+d.km+' 📋'
+                : d.km+' 📋';
+        TRAINING_PLAN[key] = { type:typ, label:lbl };
+      }
     }
-    card.appendChild(grid); weekDiv.appendChild(card); container.appendChild(weekDiv);
+  })();
+
+  var TERMINE = [
+    { id:'t20261108', datum:'2026-11-08', titel:'Teltowkanal-HM (Testlauf)', typ:'wichtig', zeit:'' },
+    { id:'t20261005', datum:'2026-10-05', titel:'Start Phase 2', typ:'wichtig', zeit:'' }
+  ];
+  var _currentEditDate = null;
+  var _rendered = { training:false, sleep:false, cal:false };
+  var _openWeek = 33;
+
+  function $(id){ return document.getElementById(id); }
+
+  // Countdown — läuft sofort, unabhängig von Charts
+  try {
+    var d = $('days');
+    if (d) d.textContent = Math.ceil((MARATHON - new Date()) / 86400000);
+  } catch(e){}
+
+  // ---------- TABS ----------
+  window.showTab = function(id, el){
+    var tabs = document.querySelectorAll('.tab-content');
+    for (var i=0;i<tabs.length;i++){ tabs[i].classList.remove('active'); }
+    var navs = document.querySelectorAll('.nav-item');
+    for (var j=0;j<navs.length;j++){ navs[j].classList.remove('on'); }
+    var target = $('tab-'+id);
+    if (target) target.classList.add('active');
+    if (el) el.classList.add('on');
+    if (id === 'training' && !_rendered.training) { _rendered.training = true; renderTraining(); }
+    if (id === 'sleep' && !_rendered.sleep)       { _rendered.sleep = true; renderSleep(); }
+    if (id === 'calendar')                         { renderLadder(); renderWeeks(); renderKalender(); }
+  };
+
+  // ---------- LONG-RUN-LEITER ----------
+  var LADDER = [{kw:32,lr:8.4,ist:true,regen:false}].concat(PLAN8.map(function(w){ return {kw:w.kw, lr:w.lr, ist:false, regen:w.regen}; }));
+  var MAX_LR = 17.5;
+
+  function renderLadder(){
+    var host = $('ladder'), ax = $('ladder-axis');
+    if (!host || !ax) return;
+    host.innerHTML = ''; ax.innerHTML = '';
+    LADDER.forEach(function(w){
+      var col = document.createElement('div');
+      col.className = 'ladder-col' + (w.regen?' regen':'') + (w.ist?' ist':'') + (w.kw===_openWeek?' on':'');
+      col.title = 'KW'+w.kw+' · '+w.lr+' km';
+      col.innerHTML = '<div class="ladder-val">'+String(w.lr).replace('.',',')+'</div>'+
+                      '<div class="ladder-bar" style="height:'+Math.round((w.lr/MAX_LR)*100)+'%"></div>';
+      col.addEventListener('click', function(){
+        if (w.ist) return;
+        _openWeek = w.kw; renderLadder(); renderWeeks();
+        var t = document.getElementById('wk-'+w.kw);
+        if (t) t.scrollIntoView({behavior:'smooth', block:'center'});
+      });
+      host.appendChild(col);
+      var s = document.createElement('span');
+      s.textContent = w.ist ? 'IST' : w.kw;
+      ax.appendChild(s);
+    });
   }
-  renderTerminList();
-}
 
-function getKW(date) {
-  const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())); const dayNum=d.getUTCDay()||7;
-  d.setUTCDate(d.getUTCDate()+4-dayNum); const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));
-  return Math.ceil((((d-yearStart)/86400000)+1)/7);
-}
+  // ---------- WOCHENKARTEN ----------
+  function renderWeeks(){
+    var host = $('wk-host'); if (!host) return;
+    host.innerHTML = '';
+    PLAN8.forEach(function(w){
+      var open = (w.kw === _openWeek);
+      var el = document.createElement('div');
+      el.className = 'wk' + (w.regen?' regen':'');
+      el.id = 'wk-'+w.kw;
+      var body = open ? '<div class="wk-body">' + w.days.map(function(d){
+        return '<div class="wk-day"><div class="wk-d">'+d.d+'<span>'+d.date+'</span></div>'+
+               '<div class="wk-t">'+d.t+'<span>'+d.n+'</span></div>'+
+               '<div class="wk-km '+d.c+'">'+d.km+'<span>'+d.z+'</span></div></div>';
+      }).join('') + '</div>' : '';
+      el.innerHTML = '<div class="wk-hdr"><span class="wk-kw">KW '+w.kw+'</span>'+
+        '<span class="wk-dates">'+w.dates+'</span>'+
+        '<span class="wk-tag">'+w.tag+'</span>'+
+        '<span class="wk-vol">'+w.vol+' · LR '+String(w.lr).replace('.',',')+'</span></div>' + body;
+      el.querySelector('.wk-hdr').addEventListener('click', function(){
+        _openWeek = (_openWeek === w.kw) ? null : w.kw;
+        renderLadder(); renderWeeks();
+      });
+      host.appendChild(el);
+    });
+  }
 
-function openModal(ds,e){
-  if(e)e.stopPropagation(); _currentEditDate=ds;
-  const d=new Date(ds+'T00:00:00');
-  document.getElementById('modal-date-title').textContent=DAY_NAMES_FULL[d.getDay()]+', '+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();
-  document.getElementById('modal-titel').value=''; document.getElementById('modal-typ').value='arbeit'; document.getElementById('modal-zeit').value='';
-  document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(()=>document.getElementById('modal-titel').focus(),200);
-}
-function closeModal(){document.getElementById('modal-overlay').classList.remove('open');_currentEditDate=null;}
-function closeModalOnBg(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
-function saveTermin(){
-  const titel=document.getElementById('modal-titel').value.trim();
-  if(!titel){document.getElementById('modal-titel').focus();return;}
-  TERMINE.push({id:'t'+Date.now(),datum:_currentEditDate,titel,typ:document.getElementById('modal-typ').value,zeit:document.getElementById('modal-zeit').value});
-  closeModal();renderKalender();
-}
-function deleteTermin(id){TERMINE=TERMINE.filter(t=>t.id!==id);renderKalender();}
-function renderTerminList(){
-  const el=document.getElementById('termin-list-all');
-  if(!TERMINE.length){el.innerHTML='<div style="color:var(--text-sub);font-size:12px;">Noch keine Termine.</div>';return;}
-  const sorted=[...TERMINE].sort((a,b)=>a.datum.localeCompare(b.datum));
-  el.innerHTML=sorted.map(t=>{
-    const d=new Date(t.datum+'T00:00:00');const label=DAY_NAMES[d.getDay()]+' '+d.getDate()+'.'+(d.getMonth()+1)+'.';
-    const typLabel={arbeit:'💼 Arbeit',privat:'🏠 Privat',reise:'✈️ Reise',wichtig:'❗ Wichtig'}[t.typ]||t.typ;
-    return `<div class="termin-item"><div class="termin-dot ${t.typ}"></div><div class="termin-info"><div class="termin-title">${t.titel}</div><div class="termin-meta">${label}${t.zeit?' · '+t.zeit:''} · ${typLabel}</div></div><button class="termin-del" onclick="deleteTermin('${t.id}')">×</button></div>`;
-  }).join('');
-}
+  // ---------- CHARTS ----------
+  var tc = '#6b7280', gc = 'rgba(0,0,0,0.06)';
+  function baseOpts(){ return { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}}, y:{ticks:{color:tc,font:{size:10}},grid:{color:gc}} } }; }
+  function hasChart(){ return typeof Chart !== 'undefined'; }
+
+  function renderVolume(){
+    if (!hasChart()) return;
+    var c = $('volChart'); if (!c) return;
+    try {
+      new Chart(c.getContext('2d'), {
+        type:'bar',
+        data:{ labels:['KW28','KW29','KW30','KW31','KW32','KW33','KW34','KW35','KW36','KW37','KW38','KW39','KW40'],
+          datasets:[{ data:[15.253,16.667,9.997,18.011,13.623,22,23.5,25,17.5,27.5,29.5,32,21.5],
+            backgroundColor:['#16a34a','#16a34a','#ca8a04','#16a34a','#16a34a','#4338ca','#4338ca','#4338ca','#ca8a04','#4338ca','#4338ca','#4338ca','#ca8a04'],
+            borderRadius:6 }] },
+        options: Object.assign(baseOpts(), { scales:{ x:{ticks:{color:tc,font:{size:10}},grid:{display:false}}, y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},suggestedMax:35} } })
+      });
+    } catch(e){ console.error('volChart', e); }
+  }
+
+  function renderTraining(){
+    if (!hasChart()) return;
+    try {
+      var v = $('vo2Chart');
+      if (v) new Chart(v.getContext('2d'), {
+        type:'line',
+        data:{ labels:['13.05.','19.05.','28.05.','03.06.','06.06.','09.06.','12.06.','14.06.','16.06.','19.06.','21.06.','23.06.','25.06.','01.07.','05.07.','07.07.','10.07.','12.07.','14.07.','16.07.','18.07.','24.07.','26.07.','28.07.','31.07.','02.08.','06.08.','08.08.'],
+          datasets:[{ data:[50.15,52.48,51.64,52.36,52.99,53.11,53.35,53.17,53.08,53.66,53.61,53.87,53.9,53.76,53.11,53.49,54.04,53.75,54.14,53.9,53.61,53.18,53.28,53.13,52.67,52.76,52.63,51.92], borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)',
+            pointBackgroundColor:['#2563eb','#16a34a','#16a34a','#16a34a','#16a34a','#16a34a','#16a34a','#16a34a','#2563eb','#16a34a','#16a34a','#16a34a','#2563eb','#2563eb','#2563eb','#2563eb','#16a34a','#2563eb','#16a34a','#2563eb','#2563eb','#2563eb','#2563eb','#2563eb','#2563eb','#4338ca','#2563eb','#4338ca'],
+            pointRadius:[5,7,7,7,7,7,8,7,7,10,8,7,8,7,7,7,8,7,10,7,7,7,7,7,7,8,7,8], tension:0.3, fill:true }] },
+        options: Object.assign(baseOpts(), { scales:{ x:{ticks:{color:tc,font:{size:9}},grid:{display:false}}, y:{min:47,max:56,ticks:{color:tc,font:{size:10}},grid:{color:gc}} } })
+      });
+    } catch(e){ console.error('vo2Chart', e); }
+    try {
+      var z = $('zoneChart');
+      if (z) new Chart(z.getContext('2d'), {
+        type:'doughnut', data:{ labels:['Z2 (120-138)','Z1 (<120)','Z3 (139-155)','Z4/5 (>155)'],
+          datasets:[{ data:[70,10,15,5], backgroundColor:['#2563eb','#93c5fd','#f59e0b','#dc2626'], borderWidth:2, borderColor:'#fff' }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,position:'right',labels:{color:tc,font:{size:10},padding:8,boxWidth:10}} } }
+      });
+    } catch(e){ console.error('zoneChart', e); }
+  }
+
+  function renderSleep(){
+    if (!hasChart()) return;
+    try {
+      var sleepData = [7.18,6.75,5.70,6.32,6.47,5.88,8.26,6.76,8.19,6.76,6.38,7.14,3.84,7.15,6.19,7.68,4.66,7.0,6.23,6.61,5.54,5.91,5.19,5.40,6.11,6.91,6.32,4.37,5.91,6.29,5.62,5.24,5.41,4.21,3.27,7.11,6.18,5.41,8.82,5.79,6.12,6.02,6.25,6.96,5.73,7.41,7.72,5.31,5.29,7.66,7.72,6.16,7.68,6.14,7.61,7.84,6.98,7.35,6.26,5.33,5.8,6.62];
+      var lbls = ['17.05','18.05','19.05','20.05','21.05','22.05','24.05','25.05','26.05','27.05','28.05','29.05','30.05','01.06','02.06','03.06','04.06','05.06','16.06','17.06','18.06','21.06','23.06','25.06','27.06','28.06','29.06','30.06','01.07','02.07','03.07','05.07','06.07','07.07','08.07','09.07','10.07','11.07','12.07','14.07','15.07','16.07','17.07','19.07','20.07','21.07','22.07','23.07','24.07','25.07','26.07','27.07','28.07','29.07','30.07','31.07','01.08','02.08','03.08','05.08','06.08','07.08'];
+      var s = $('sleepChart');
+      if (s) new Chart(s.getContext('2d'), {
+        type:'bar', data:{ labels:lbls, datasets:[{ data:sleepData, backgroundColor:sleepData.map(function(v){return v>=7?'#16a34a':v>=6?'#2563eb':v>=5?'#f59e0b':'#dc2626';}), borderRadius:5 }] },
+        options: Object.assign(baseOpts(), { scales:{ x:{ticks:{color:tc,font:{size:9}},grid:{display:false}}, y:{min:0,max:9,ticks:{color:tc,font:{size:10}},grid:{color:gc}} } })
+      });
+    } catch(e){ console.error('sleepChart', e); }
+    try {
+      var hrv = [45,40,33,38,38,37,44,43,40,37,34,32,32,43,37,42,42,45,30,45,39,43,47,30,55,44,38,33,34,34,39,37,68,41,46,58,44,35,45,38,46,41,37,31,41,31,40,38,55,31,39,45,42,39,46,45.6,28.3,42.0,38.2,36.0,36.1,37.8,38.4,34.5,30.3,44.4,34.7,52.7,71.4,42.2,36.9,38.7,34.6,41.5,47.6,45.2,45.7,41.4];
+      var hrvLbls = ['15.05','16.05','20.05','21.05','22.05','24.05','25.05','26.05','27.05','28.05','29.05','30.05','31.05','01.06','02.06','03.06','04.06','05.06','06.06','08.06','09.06','10.06','11.06','12.06','13.06','14.06','15.06','16.06','17.06','18.06','19.06','20.06','21.06','22.06','23.06','24.06','25.06','26.06','27.06','28.06','29.06','30.06','01.07','02.07','03.07','04.07','05.07','06.07','07.07','08.07','09.07','10.07','11.07','12.07','13.07','14.07','15.07','16.07','17.07','19.07','20.07','21.07','22.07','23.07','24.07','25.07','26.07','27.07','28.07','29.07','30.07','31.07','01.08','02.08','03.08','05.08','06.08','07.08'];
+      var h = $('hrvChart');
+      if (h) new Chart(h.getContext('2d'), {
+        type:'line', data:{ labels:hrvLbls, datasets:[
+          { data:hrv, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.08)', pointBackgroundColor:hrv.map(function(v){return v<30?'#dc2626':v<40?'#f59e0b':v>=50?'#16a34a':'#2563eb';}), pointRadius:hrv.map(function(v,i){return i===hrv.length-1?7:5;}), tension:0.3, fill:true },
+          { data:new Array(hrv.length).fill(30), borderColor:'#dc2626', borderDash:[4,4], borderWidth:1.5, pointRadius:0 }
+        ]},
+        options: Object.assign(baseOpts(), { plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:tc,font:{size:9}},grid:{display:false}}, y:{min:0,ticks:{color:tc,font:{size:10}},grid:{color:gc}} } })
+      });
+    } catch(e){ console.error('hrvChart', e); }
+    try {
+      var rhr = [52,57,53,53,52,59,52,58,55,50,48,53,55,55,54,56,53,53,58,55,59,60,54,53,53,52,53,54,54,54,53,53,55,54,53,55,53,55,56,57,58,57,56,53,54,53,54,54,52,52,55,57,57,53,54,53,56,52,52,53,55,52];
+      var rhrLbls = ['03.06','04.06','05.06','06.06','08.06','09.06','10.06','11.06','12.06','13.06','14.06','15.06','16.06','17.06','18.06','19.06','20.06','22.06','23.06','24.06','25.06','26.06','27.06','28.06','29.06','30.06','01.07','02.07','03.07','04.07','05.07','06.07','07.07','08.07','09.07','10.07','11.07','12.07','13.07','14.07','15.07','16.07','17.07','19.07','20.07','21.07','22.07','23.07','24.07','25.07','26.07','27.07','28.07','29.07','30.07','31.07','01.08','02.08','03.08','05.08','06.08','07.08'];
+      var r = $('rhrChart');
+      if (r) new Chart(r.getContext('2d'), {
+        type:'line', data:{ labels:rhrLbls, datasets:[
+          { data:rhr, borderColor:'#16a34a', backgroundColor:'rgba(22,163,74,0.08)', pointBackgroundColor:rhr.map(function(v){return v<=50?'#16a34a':v<=55?'#2563eb':v<=60?'#f59e0b':'#dc2626';}), pointRadius:rhr.map(function(v,i){return i===rhr.length-1?7:5;}), tension:0.3, fill:true },
+          { data:new Array(rhr.length).fill(55), borderColor:'#2563eb', borderDash:[4,4], borderWidth:1.5, pointRadius:0 }
+        ]},
+        options: Object.assign(baseOpts(), { plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:tc,font:{size:9}},grid:{display:false}}, y:{min:40,max:70,ticks:{color:tc,font:{size:10}},grid:{color:gc}} } })
+      });
+    } catch(e){ console.error('rhrChart', e); }
+  }
+
+  // ---------- KALENDER (Tagesraster, 8 Wochen rollierend) ----------
+  function getMonday(d){ var date=new Date(d); var day=date.getDay(); date.setDate(date.getDate()+(day===0?-6:1-day)); date.setHours(0,0,0,0); return date; }
+  function dateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function addDays(d,n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
+  function fmtDay(d){ return d.getDate()+'.'+(d.getMonth()+1)+'.'; }
+  function getKW(date){ var d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())); var dayNum=d.getUTCDay()||7; d.setUTCDate(d.getUTCDate()+4-dayNum); var yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil((((d-yearStart)/86400000)+1)/7); }
+
+  var WEEK_HORIZON = 9; // laufende Woche + 8 Wochen voraus (Regel R1)
+
+  function renderKalender(){
+    var container = $('kal-container'); if (!container) return;
+    container.innerHTML='';
+    var monday = getMonday(TODAY);
+    for (var w=0;w<WEEK_HORIZON;w++){
+      var weekStart=addDays(monday,w*7), weekEnd=addDays(weekStart,6), kw=getKW(weekStart);
+      var meta = null;
+      for (var m=0;m<PLAN8.length;m++){ if (PLAN8[m].kw===kw) meta = PLAN8[m]; }
+      var weekDiv=document.createElement('div'); weekDiv.className='kal-week';
+      var hdr=document.createElement('div'); hdr.className='kal-week-hdr';
+      hdr.innerHTML='<span>'+fmtDay(weekStart)+' – '+fmtDay(weekEnd)+(meta?' · '+meta.tag:'')+'</span>'+
+                    '<span class="kw-badge">KW '+kw+(meta?' · '+meta.vol:'')+'</span>';
+      weekDiv.appendChild(hdr);
+      var card=document.createElement('div'); card.className='card'; card.style.padding='10px'; card.style.marginBottom='0';
+      var grid=document.createElement('div'); grid.className='kal-grid';
+      for (var dd=0;dd<7;dd++){
+        var day=addDays(weekStart,dd), ds=dateStr(day);
+        var isToday=ds===dateStr(TODAY), isPast=day<TODAY&&!isToday;
+        var training=TRAINING_PLAN[ds]||null;
+        var termine=TERMINE.filter(function(t){return t.datum===ds;});
+        var dayDiv=document.createElement('div');
+        dayDiv.className='kal-day'+(isToday?' today':'')+(isPast?' past':'')+(!training&&!isToday?' rest':'');
+        var chips = training ? '<span class="kal-chip '+training.type+'">'+training.label+'</span>' : '';
+        chips += termine.map(function(t){return '<span class="kal-chip termin-'+t.typ+'">'+(t.zeit?t.zeit+' ':'')+t.titel+'</span>';}).join('');
+        dayDiv.innerHTML='<div class="kal-day-name">'+DAY_NAMES[day.getDay()]+'</div><div class="kal-day-num">'+day.getDate()+'</div>'+chips+'<button class="kal-add-btn" onclick="openModal(\''+ds+'\',event)">+</button>';
+        (function(dsLocal){
+          dayDiv.addEventListener('click',function(e){ if(e.target.classList.contains('kal-add-btn'))return; openModal(dsLocal); });
+        })(ds);
+        grid.appendChild(dayDiv);
+      }
+      card.appendChild(grid); weekDiv.appendChild(card); container.appendChild(weekDiv);
+    }
+    renderTerminList();
+  }
+
+  window.openModal = function(ds,e){
+    if(e)e.stopPropagation(); _currentEditDate=ds;
+    var d=new Date(ds+'T00:00:00');
+    $('modal-date-title').textContent=DAY_NAMES_FULL[d.getDay()]+', '+d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();
+    $('modal-titel').value=''; $('modal-typ').value='arbeit'; $('modal-zeit').value='';
+    $('modal-overlay').classList.add('open');
+    setTimeout(function(){$('modal-titel').focus();},200);
+  };
+  window.closeModal = function(){ $('modal-overlay').classList.remove('open'); _currentEditDate=null; };
+  window.closeModalOnBg = function(e){ if(e.target===$('modal-overlay')) closeModal(); };
+  window.saveTermin = function(){
+    var titel=$('modal-titel').value.trim();
+    if(!titel){$('modal-titel').focus();return;}
+    TERMINE.push({id:'t'+Date.now(),datum:_currentEditDate,titel:titel,typ:$('modal-typ').value,zeit:$('modal-zeit').value});
+    closeModal(); renderKalender();
+  };
+  window.deleteTermin = function(id){ TERMINE=TERMINE.filter(function(t){return t.id!==id;}); renderKalender(); };
+  function renderTerminList(){
+    var el=$('termin-list-all'); if(!el) return;
+    if(!TERMINE.length){ el.innerHTML='<div style="color:var(--text-sub);font-size:12px;">Noch keine Termine.</div>'; return; }
+    el.innerHTML=TERMINE.slice().sort(function(a,b){return a.datum.localeCompare(b.datum);}).map(function(t){
+      var d=new Date(t.datum+'T00:00:00'); var label=DAY_NAMES[d.getDay()]+' '+d.getDate()+'.'+(d.getMonth()+1)+'.';
+      var typLabel=({arbeit:'💼 Arbeit',privat:'🏠 Privat',reise:'✈️ Reise',wichtig:'❗ Wichtig'})[t.typ]||t.typ;
+      return '<div class="termin-item"><div class="termin-dot '+t.typ+'"></div><div class="termin-info"><div class="termin-title">'+t.titel+'</div><div class="termin-meta">'+label+(t.zeit?' · '+t.zeit:'')+' · '+typLabel+'</div></div><button class="termin-del" onclick="deleteTermin(\''+t.id+'\')">×</button></div>';
+    }).join('');
+  }
+
+  // ---------- INIT ----------
+  function init(){ renderVolume(); }
+  if (document.readyState === 'complete') { init(); }
+  else { window.addEventListener('load', init); }
+})();
 </script>
 </body>
 </html>
